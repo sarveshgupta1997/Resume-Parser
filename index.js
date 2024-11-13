@@ -47,6 +47,7 @@ function extractNameFromResume(text) {
   return "Not found";
 }
 
+
 function extractNameUsingKeywords(text) {
   const nameKeywords = [
     "Name",
@@ -54,11 +55,29 @@ function extractNameUsingKeywords(text) {
     "Applicant Name",
     "Full Name",
   ];
+
+  const prevWords = [
+    "project", "college", "father", "father's", "fathers", "mother", "mother's", "spouse", 
+    "spouse's", "husband", "husband's", "wife", "wife's", "school", "university", 
+    "company", "company's", "organization", "organization's", "institute", 
+    "institute's", "employer", "employer's", "department", "department's", 
+    "branch", "branch's", "division", "division's", "team", "team's", "supervisor", 
+    "supervisor's", "manager", "manager's", "head", "head's", "coordinator", 
+    "coordinator's", "contact", "contact's", "relation", "relation's", "reference", 
+    "reference's", "next of kin", "guardian", "guardian's", "emergency contact", 
+    "emergency contact's", "advisor", "advisor's", "tutor", "tutor's", "mentor", 
+    "mentor's", "teacher", "teacher's", "guide", "guide's", "counselor", "counselor's"
+  ];
+
   const lines = text.split("\n");
 
   for (let line of lines) {
+    // Convert the line to lowercase for case-insensitive matching
+    const lowerLine = line.toLowerCase();
+
     for (let keyword of nameKeywords) {
-      if (line.includes(keyword)) {
+      // Check if the line contains the keyword and does not contain any of the prevWords
+      if (line.includes(keyword) && !prevWords.some(prev => lowerLine.includes(prev))) {
         const parts = line.split(":");
         if (parts.length > 1) {
           const name = parts[1].trim();
@@ -71,17 +90,57 @@ function extractNameUsingKeywords(text) {
   return "Not found";
 }
 
+
 function extractNameFromTopLines(text) {
+  // List of keywords to skip when looking for names at the top
+  const skipsKeywords = [
+    "Resume", "Biodata", "CURRICULUM VITAE", "CV", "Profile", "Introduction", 
+    "Summary", "Professional Summary", "Objective", "Cover Letter", "Personal Information", 
+    "Candidate Profile", "Details", "Applicant Profile", "Application", "Applicant", 
+    "Contact Information", "Contact Details", "Personal Details", "Name", "Title", 
+    "Experience", "Skills", "Technical Skills", "Education", "Projects", "Certifications", 
+    "Training", "Achievements", "Professional Background",
+  
+    // Common roles in tech and other domains
+    "Developer", "Engineer", "Manager", "Consultant", "Analyst", "Administrator", 
+    "Specialist", "Coordinator", "Operator", "Support", "Executive", "HR", "Sales", 
+    "Marketing", "Finance", "Accounts", "Operations", "Testing", "Tester", "QA", 
+    "Quality Assurance", "Product Owner", "Product Manager", "Scrum Master", "Team Lead", 
+  
+    // Specific tech roles and technologies
+    "Java Developer", "Java Spring Boot Developer", "JavaScript Developer", 
+    "Frontend Developer", "Backend Developer", "Full Stack Developer", "Node.js Developer", 
+    "Python Developer", "Dotnet Developer", ".NET Developer", "Angular Developer", 
+    "React Developer", "Vue Developer", "PHP Developer", "SQL Developer", "Data Scientist", 
+    "Machine Learning Engineer", "AI Engineer", "Cloud Engineer", "DevOps Engineer", 
+    "Systems Administrator", "IT Support", "Software Engineer", "Software Developer", 
+    "Web Developer", "Mobile Developer", "iOS Developer", "Android Developer", 
+    "Technical Support", "Helpdesk", "Customer Support", "Customer Service",
+  
+    // Additional qualifiers
+    "Immediate Joiner", "Looking for Opportunities", "Open to Work", "Available Immediately",
+    "Notice Period", "Freelancer", "Intern", "Contractor", "Consultant", 
+    "Temporary", "Full-time", "Part-time", "Remote Worker", "Onsite", "Hybrid"
+  ];
+  
+  
   const lines = text.split("\n");
 
   for (let i = 0; i < Math.min(5, lines.length); i++) {
+    // Skip lines containing any of the skip keywords
+    if (skipsKeywords.some(keyword => lines[i].toUpperCase().includes(keyword.toUpperCase()))) {
+      continue;
+    }
+    
+    // console.log( "lines: ",lines);
     const words = lines[i].trim().split(/\s+/);
 
     // Filter capitalized words
     const capitalizedWords = words.filter((word) =>
-      /^[A-Z][a-zA-Z]+$/.test(word)
+      /^[A-Z][a-zA-Z]+$/.test(word) || /^[A-Z]+$/.test(word)
+      // /^[A-Z][a-zA-Z]+$/.test(word)
     );
-
+    // console.log("capitalizedWords: ",capitalizedWords, "Words: ",words)
     if (
       capitalizedWords.length === 2 ||
       capitalizedWords.length === 3 ||
@@ -116,17 +175,139 @@ function validateName(name) {
   // Check if the extracted name matches any invalid terms
   return !invalidNameTerms.some((term) => name.includes(term));
 }
-// Function for extracting Date of Birth (DOB)
-function extractDOB(text) {
-  const dobRegex = /(?:D\.?O\.?B\.?\s*[-–—]?\s*)(\d{2}[\/\-]\d{2}[\/\-]\d{4})/i;
 
-  const dobMatch = text.match(dobRegex);
-  return dobMatch ? dobMatch[1].trim() : "Not found";
+
+
+
+// // Function for extracting Date of Birth (DOB)
+// function extractDOB(text) {
+//   const dobRegex = /(?:D\.?O\.?B\.?\s*[-–—]?\s*)(\d{2}[\/\-]\d{2}[\/\-]\d{4})/i;
+
+//   const dobMatch = text.match(dobRegex);
+//   return dobMatch ? dobMatch[1].trim() : "Not found";
+// }
+
+// function extractDOB(text) {
+//   // Define date of birth keywords (case insensitive)
+//   const dobKeywords = ["dob", "d o b", "d.o.b", "d.o.b.", "DOB", "D O B", "D.O.B", "D.O.B.", "Date of Birth"];
+  
+//   // Create a regex pattern to handle dates in both numeric (dd/mm/yyyy or dd-mm-yyyy) 
+//   // and textual month formats (dd Month yyyy or ddth Month yyyy)
+//   const dobPattern = new RegExp(
+//       `(?:${dobKeywords.join("|")})[:\\s-]*` + // Match any DOB keyword followed by optional characters
+//       `(\\d{1,2})(?:st|nd|rd|th)?[\\/\\-\\s]?` + // Match day with optional ordinal suffix (1st, 2nd, 3rd, 4th)
+//       `([a-zA-Z]+|\\d{1,2})[\\/\\-\\s]?` +       // Match month (numeric or abbreviated textual month)
+//       `(\\d{4})`,                                // Match year (4 digits)
+//       "i"
+//   );
+  
+//   // Define month names mapping
+//   const monthMapping = {
+//       "jan": "01", "feb": "02", "mar": "03", "apr": "04",
+//       "may": "05", "jun": "06", "jul": "07", "aug": "08",
+//       "sep": "09", "oct": "10", "nov": "11", "dec": "12",
+//       "january": "01", "february": "02", "march": "03", "april": "04",
+//       "june": "06", "july": "07", "august": "08", "september": "09",
+//       "october": "10", "november": "11", "december": "12"
+//   };
+  
+//   // Search for the date pattern in the input text
+//   const match = text.match(dobPattern);
+  
+//   if (match) {
+//       // Extract day, month, and year from the matched pattern
+//       let day = match[1].padStart(2, "0");
+//       let month = match[2];
+//       let year = match[3];
+      
+//       // Convert textual month to numeric if necessary
+//       month = isNaN(month) ? monthMapping[month.toLowerCase().slice(0, 3)] : month.padStart(2, "0");
+      
+//       return `${day}/${month}/${year}`;
+//   }
+  
+//   return "Not found";
+// }
+function extractDOB(text) {
+  // Define date of birth keywords (case insensitive)
+  const dobKeywords = [
+      "dob", "d o b", "d.o.b", "d.o.b.", 
+      "DOB", "D O B", "D.O.B", "D.O.B.", 
+      "Date of Birth", "DATE OF BIRTH", "date of birth"
+  ];
+  
+  // Create a keyword regex pattern
+  const keywordPattern = dobKeywords.join("|");
+  
+  // Define month names mapping (both full and abbreviated)
+  const monthMapping = {
+      "january": "01", "february": "02", "march": "03", "april": "04",
+      "may": "05", "june": "06", "july": "07", "august": "08",
+      "september": "09", "october": "10", "november": "11", "december": "12",
+      "jan": "01", "feb": "02", "mar": "03", "apr": "04",
+      "jun": "06", "jul": "07", "aug": "08", "sep": "09",
+      "oct": "10", "nov": "11", "dec": "12"
+  };
+  
+  // Define regex patterns for different date formats
+  const patterns = [
+      // Pattern 1: Day Month Year (e.g., 19 Jan 1988, 04.08.1993, 8-2-2023)
+      new RegExp(
+          `(?:${keywordPattern})[:\\s-]*` +                      // DOB keyword
+          `(\\d{1,2})(?:\\s?)(?:st|nd|rd|th)?[\\.\\/\\-\\s,]*` + // Day with optional ordinal and whitespace
+          `([a-zA-Z]+|\\d{1,2})[\\.\\/\\-\\s,]*` +               // Month (text or number)
+          `(\\d{4})`,                                            // Year
+          "i"
+      ),
+      // Pattern 2: Month Day Year (e.g., October 20, 1995, June 12th, 1993)
+      new RegExp(
+          `(?:${keywordPattern})[:\\s-]*` +                      // DOB keyword
+          `([a-zA-Z]+)[\\.\\/\\-\\s,]*` +                       // Month (text)
+          `(\\d{1,2})(?:\\s?)(?:st|nd|rd|th)?[\\.\\/\\-\\s,]*` + // Day with optional ordinal and whitespace
+          `(\\d{4})`,                                            // Year
+          "i"
+      )
+  ];
+  
+  // Iterate over each pattern to find a match
+  for (let pattern of patterns) {
+      const match = text.match(pattern);
+      if (match) {
+          let day, month, year;
+          
+          if (pattern === patterns[0]) {
+              // Pattern 1 matched: Day Month Year
+              day = match[1].padStart(2, '0');
+              month = match[2];
+              year = match[3];
+          } else {
+              // Pattern 2 matched: Month Day Year
+              month = match[1];
+              day = match[2].padStart(2, '0');
+              year = match[3];
+          }
+          
+          // Convert month to numeric if it's in text format
+          if (isNaN(month)) {
+              month = monthMapping[month.toLowerCase()];
+              if (!month) {
+                  // If month is not recognized, return null
+                  return null;
+              }
+          } else {
+              month = month.padStart(2, '0');
+          }
+          
+          return `${day}/${month}/${year}`;
+      }
+  }
+  return "Not found";
 }
 
 //Function for extracting Email -------
 function extractEmailFromResume(text) {
-  const emailKeywords = ["Email", "email", "E-mail", "Mail", "mail"];
+  // console.log(text)
+  const emailKeywords = [ "E-mail-", "E-mail:", "Email-", "Email:", "Email", "email", "E-mail", "Mail", "mail"];
   const emailRegex = new RegExp(
     `(?:[\\u2709\\uE001]?\\s*(?:${emailKeywords.join(
       "|"
@@ -138,7 +319,29 @@ function extractEmailFromResume(text) {
 
   return email;
 }
-//Function for Phone No. Extraction------
+
+
+// //Function for Phone No. Extraction------
+// function extractPhoneFromResume(text) {
+//   const phoneKeywords = [
+//     "Phone",
+//     "Contact No",
+//     "Mobile",
+//     "Phone Number",
+//     "Tel",
+//   ];
+//   const phoneRegex = new RegExp(
+//     `(?:[\\u260E\\u2706\\u1F4DE]?\\s*(?:${phoneKeywords.join(
+//       "|"
+//     )})?\\s*[:]?\\s*(\\d{10}))`,
+//     "i"
+//   );
+//   const phoneMatch = text.match(phoneRegex);
+//   const phone = phoneMatch ? phoneMatch[1]?.trim() : "Not found";
+
+//   return phone;
+// }
+
 function extractPhoneFromResume(text) {
   const phoneKeywords = [
     "Phone",
@@ -147,17 +350,28 @@ function extractPhoneFromResume(text) {
     "Phone Number",
     "Tel",
   ];
+  
+  // Regular expression to match phone numbers with optional country code prefixes
   const phoneRegex = new RegExp(
     `(?:[\\u260E\\u2706\\u1F4DE]?\\s*(?:${phoneKeywords.join(
       "|"
-    )})?\\s*[:]?\\s*(\\d{10}))`,
+    )})?\\s*[:]?\\s*([+]?91|0)?(\\d{10,14}))`,
     "i"
   );
+
   const phoneMatch = text.match(phoneRegex);
-  const phone = phoneMatch ? phoneMatch[1]?.trim() : "Not found";
+  
+  let phone = phoneMatch ? phoneMatch[2]?.trim() : "Not found";
+
+  // If phone is more than 10 digits, take the last 10 digits as the primary number
+  if (phone && phone.length > 10) {
+    phone = phone.slice(-10);
+  }
 
   return phone;
 }
+
+
 // Function for extracting Marital Status
 function extractMaritalStatus(text) {
   const maritalStatusKeywords = ["Marital Status", "Marital"];
@@ -198,45 +412,160 @@ function extractEducation(text) {
 }
 
 //Function for Technical Skills Extraction ------------
+// function extractTechnicalSkills(text) {
+//   const sections = {
+//     collective: ["Technical Skills", "Skills", "Core Skills", "Relevant Skills"],
+//     languages: ["Programming Languages", "Languages"],
+//     frameworks: ["Technologies", "Frameworks", "Libraries"],
+//     tools: ["Tools", "Developer Tools"],
+//   };
+
+//   const skills = { collective: [], languages: [], frameworks: [], tools: [] };
+//   const predefinedLanguages = ["C++", "Java", "JavaScript", "Python", "HTML", "CSS", "C"];
+//   const predefinedFrameworks = ["React", "Angular", "Node.js", "Django", "Flask"];
+//   const predefinedTools = ["Git", "VS Code", "Postman"];
+
+//   function extractSectionSkills(sectionKeywords, defaultSkills) {
+//     for (const keyword of sectionKeywords) {
+//       const regex = new RegExp(`${keyword}\\s*[:\\-]?\\s*([\\w\\s,]+)`, "i");
+//       const match = text.match(regex);
+//       if (match) {
+//         return match[1].split(/,\s*/).filter(skill => defaultSkills.includes(skill));
+//       }
+//     }
+//     return defaultSkills.filter(skill => text.includes(skill));
+//   }
+
+//   // Extract skills from each section
+//   skills.collective = extractSectionSkills(sections.collective, [...predefinedLanguages, ...predefinedFrameworks, ...predefinedTools]);
+//   skills.languages = extractSectionSkills(sections.languages, predefinedLanguages);
+//   skills.frameworks = extractSectionSkills(sections.frameworks, predefinedFrameworks);
+//   skills.tools = extractSectionSkills(sections.tools, predefinedTools);
+
+//   // Combine all skills into one array and remove duplicates
+//   skills.allSkills = Array.from(new Set([
+//     ...skills.collective,
+//     ...skills.languages,
+//     ...skills.frameworks,
+//     ...skills.tools,
+//   ]));
+
+//   return skills;
+// }
+
 function extractTechnicalSkills(text) {
-  const sections = {
-    collective: ["Technical Skills", "Skills", "Core Skills", "Relevant Skills"],
-    languages: ["Programming Languages", "Languages"],
-    frameworks: ["Technologies", "Frameworks", "Libraries"],
-    tools: ["Tools", "Developer Tools"],
-  };
-
-  const skills = { collective: [], languages: [], frameworks: [], tools: [] };
-  const predefinedLanguages = ["C++", "Java", "JavaScript", "Python", "HTML", "CSS", "C"];
-  const predefinedFrameworks = ["React", "Angular", "Node.js", "Django", "Flask"];
-  const predefinedTools = ["Git", "VS Code", "Postman"];
-
-  function extractSectionSkills(sectionKeywords, defaultSkills) {
-    for (const keyword of sectionKeywords) {
-      const regex = new RegExp(`${keyword}\\s*[:\\-]?\\s*([\\w\\s,]+)`, "i");
-      const match = text.match(regex);
-      if (match) {
-        return match[1].split(/,\s*/).filter(skill => defaultSkills.includes(skill));
-      }
-    }
-    return defaultSkills.filter(skill => text.includes(skill));
+  if (!text || typeof text !== "string") {
+    throw new Error("Invalid input: text must be a non-empty string");
   }
 
-  // Extract skills from each section
-  skills.collective = extractSectionSkills(sections.collective, [...predefinedLanguages, ...predefinedFrameworks, ...predefinedTools]);
-  skills.languages = extractSectionSkills(sections.languages, predefinedLanguages);
-  skills.frameworks = extractSectionSkills(sections.frameworks, predefinedFrameworks);
-  skills.tools = extractSectionSkills(sections.tools, predefinedTools);
+  const keywords = [
+    "Technical Skills",
+    "Skills",
+    "Core Skills",
+    "Relevant Skills",
+    "Tech Stack",
+   
+  ];
 
-  // Combine all skills into one array and remove duplicates
-  skills.allSkills = Array.from(new Set([
-    ...skills.collective,
-    ...skills.languages,
-    ...skills.frameworks,
-    ...skills.tools,
-  ]));
+  const predefinedSkills = [
+      // Programming Languages
+      "C++", "Java", "JavaScript", "Python", "HTML", "HTML5", "CSS", "C",
+      "TypeScript", "PHP", "Ruby", "Go", "Swift", "Kotlin", "Rust", "Scala",
+      "VB.NET", "C#", "F#", "Perl", "R", "Matlab","Data Structures And Algorithms",
+        // Frontend Development
+    "React JS","React", "Angular", "Vue.js", "Svelte", "jQuery", "jQuery","Bootstrap",
+    "TailwindCSS", "Material-UI", "Ant Design", "Sass", "Less",
 
-  return skills;
+    // Backend Development
+    "Node.js", "Django", "Flask", "Express.js", "Ruby on Rails",
+    "Spring", "Spring Boot", "Spring MVC", "Hibernate", "Laravel",
+    "CodeIgniter", "Symfony", "ASP.NET Core", "Koa.js", "FastAPI",
+
+    // Databases
+    "MySQL", "PostgreSQL", "MongoDB", "Oracle", "Firebase", "SQLite","SQL",
+    "Redis", "Cassandra", "Elasticsearch", "MariaDB", "DynamoDB", "CockroachDB",
+
+    // Cloud and DevOps
+    "AWS", "Azure", "Google Cloud", "Docker", "Kubernetes", "Terraform",
+    "Jenkins", "Ansible", "Puppet", "Chef", "CloudFormation", "Heroku",
+    "Netlify", "Vercel", "CircleCI", "GitHub Actions",
+
+    // Tools and Version Control
+    "Git", "GitHub", "GitLab", "Bitbucket", "VS Code", "Eclipse",
+    "IntelliJ IDEA", "PyCharm", "Xcode", "NetBeans", "Postman", "Fiddler",
+    "Wireshark", "JIRA", "Confluence", "Maven", "Gradle", "NPM", "Yarn",
+
+    // Network Engineering
+    "Cisco", "Juniper", "BGP", "OSPF", "IPSec", "VPN", "Firewall", "Load Balancer",
+    "Network Security", "F5 BIG-IP", "NGINX", "HAProxy", "TCP/IP", "Ethernet", "DNS",
+    "DHCP", "LAN", "WAN", "SD-WAN", "Packet Tracing", "Subnetting","SNMP","VLAN", "VTP", "HSRP", "VRRP", "STP",
+    "MPLS", "MPLS L2 VPN", "MPLS L3 VPN","Routing", "Switching", "Configuration", "Protocols",
+     "BGP", "OSPF", "EIGRP","Access lists","Extended IP access lists","Standard IP access lists", "BGP Configuration"," VPN Configuration","OSPF Configuration",
+     "STP Configuration","NAT Configuration","Troubleshooting",
+
+    // Security Specialist
+    "SSL/TLS", "WAF", "DDoS Mitigation", "SOC Operations", "SIEM",
+    "F5 BIG-IP LTM", "F5 ASM", "F5 APM", "Zero Trust", "IAM", "Penetration Testing",
+    "Vulnerability Assessment", "IDS/IPS", "Threat Hunting", "Endpoint Security",
+    "OWASP", "SANS", "CyberArk", "Fortinet", "Palo Alto Networks", "Splunk",
+
+    // Solution Architect
+    "Microservices", "Event-Driven Architecture", "Monolithic Architecture",
+    "SOA", "API Gateway", "Load Balancing", "High Availability", "Disaster Recovery",
+    "Scalability", "Elasticity", "CI/CD Pipelines", "Serverless",
+    "Cost Optimization", "Cloud Migration", "System Design", "Business Continuity",
+
+    // Other Relevant Technologies
+    "GraphQL", "REST APIs", "WebSockets", "OAuth", "JWT", "AJAX",
+    "WebRTC", "OpenShift", "Kong API Gateway", "Istio", "Apache Kafka",
+    "RabbitMQ", "ActiveMQ", "Elastic Stack", "Prometheus", "Grafana",
+    "Logstash", "Kibana", "New Relic", "Datadog", "PagerDuty"
+  ];
+
+  const predefinedSkillsLower = predefinedSkills.map(skill => skill.toLowerCase());
+
+  const keywordRegex = new RegExp(
+    `(${keywords.join("|")})\\s*[:\\-]?\\s*([\\w\\W]+?)(?=\\n\\n|$)`,
+    "gi"
+  );
+
+  const matches = [];
+  let match;
+
+  while ((match = keywordRegex.exec(text)) !== null) {
+    matches.push({
+      keyword: match[1],
+      content: match[2],
+    });
+  }
+
+  if (!matches || matches.length === 0) {
+    // console.log("No matches found in the text.");
+    return { foundKeywords: [], extractedSkills: [] };
+  }
+
+  const foundKeywords = matches.map(match => match.keyword);
+  // console.log("Found Keywords:", foundKeywords);
+
+  const extractedSkills = matches
+    .flatMap(match => {
+      if (match && match.content) {
+        return match.content.split(/[\n,]/); // Split skills by newline or comma
+      }
+      console.warn("Skipping invalid match:", match);
+      return [];
+    })
+    .map(skill => skill.trim().toLowerCase())
+    .filter(skill => predefinedSkillsLower.includes(skill));
+
+  // Ensure unique skills (deduplicate the list)
+  const uniqueSkills = Array.from(new Set(extractedSkills)).map(skill =>
+    predefinedSkills.find(predefined => predefined.toLowerCase() === skill)
+  );
+
+  // console.log("Extracted Skills:", uniqueSkills);
+
+  return { foundKeywords, extractedSkills: uniqueSkills };
 }
 
 function extractJobTitle(text) {
