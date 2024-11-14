@@ -594,16 +594,153 @@ function extractTechnicalSkills(text) {
   return { foundKeywords, extractedSkills: uniqueSkills };
 }
 
+// function extractJobTitle(text) {
+//   const jobKeywords = ["Job Title", "Position", "Role", "Designation"];
+//   const jobRegex = new RegExp(
+//     `(?:${jobKeywords.join("|")})\\s*[-:–]?\\s*([\\w\\s]+)`,
+//     "i"
+//   );
+
+//   const jobMatch = text.match(jobRegex);
+//   return jobMatch ? jobMatch[1].trim() : "Not found";
+// }
+
 function extractJobTitle(text) {
-  const jobKeywords = ["Job Title", "Position", "Role", "Designation"];
+  console.log("text:",text)
+  const jobKeywords = [
+    "Job Title", "Designation", "Job Position", 
+    "Employment Title", "Career Position", "Professional Role", "Career Title", 
+    "Position Title", "Job Role", "Job Description", "Position Name", 
+    "Position Held", "Position Of", "Official Title", "Current Position",
+    "Work Title", "Work Position", "Professional Title"
+  ];
+  const predefinedRoles = [
+    // Programming Languages
+    "Software Developer", "Project Manager", ".NET Developer", ".Net Developer","Software Engineer", "Full Stack Web Developer", "Full Stack Developer","full-stack web developer", "Frontend Developer", "Backend Developer",
+    "System Engineer", "Embedded Software Engineer", "Application Developer", "Game Developer", "Automation Engineer",
+    "AI Developer", "ML Engineer", "Data Engineer", "Quantitative Developer", "Scripting Engineer", "Code Reviewer",
+    "Lead Software Developer", "Senior Software Engineer", "Principal Engineer", "Java Spring Boot Developer",
+    "Senior Java Developer", "Lead Java Developer", "Java Module Lead", "Team Lead",
+
+    // Frontend Development
+    "Frontend Developer", "UI Developer", "Web Developer", "React Developer", "Angular Developer", 
+    "Vue.js Developer", "Svelte Developer", "HTML/CSS Developer", "UI/UX Engineer", "Web Designer", 
+    "Mobile Frontend Developer", "Frontend Architect", "SPA Developer", "UI Framework Specialist",
+    "Senior Frontend Developer", "Lead Frontend Developer", "Frontend Team Lead", "Frontend Module Lead",
+
+    // Backend Development
+    "Backend Developer", "Node.js Developer", "Django Developer", "Flask Developer", "Express.js Developer",
+    "Ruby on Rails Developer", "Java Backend Developer", "PHP Developer", "API Developer", "Microservices Developer",
+    "Middleware Developer", "Backend Architect", "Data Engineer", "Platform Engineer", "Backend Infrastructure Engineer",
+    "Senior Backend Developer", "Lead Backend Developer", "Backend Team Lead", "Java Spring Boot Developer",
+    "Microservices Module Lead", "Backend Module Lead",
+
+    // Databases
+    "Database Administrator", "Data Engineer", "SQL Developer", "Database Developer", "MongoDB Specialist", 
+    "Data Scientist", "ETL Developer", "Big Data Engineer", "Data Architect", "Database Migration Specialist",
+    "Data Warehouse Engineer", "Database Security Engineer", "Data Ops Engineer", "Cloud Database Administrator",
+    "Senior Database Engineer", "Lead Database Engineer", "Database Team Lead",
+
+    // Cloud and DevOps
+    "DevOps Engineer", "Cloud Engineer", "AWS Developer", "Azure Engineer", "Google Cloud Architect",
+    "Site Reliability Engineer (SRE)", "Infrastructure Engineer", "Build and Release Engineer", "CI/CD Specialist",
+    "Platform Engineer", "Cloud Architect", "Containerization Specialist", "Automation Engineer", "Cloud Migration Specialist",
+    "Network Operations Engineer", "Kubernetes Administrator", "Infrastructure Architect", "Cloud Solutions Engineer",
+    "Senior DevOps Engineer", "Lead DevOps Engineer", "DevOps Team Lead",
+
+    // Tools and Version Control
+    "Software Engineer", "Version Control Specialist", "Release Manager", "Build Engineer", "Automation Engineer",
+    "Technical Support Engineer", "Systems Administrator", "Quality Assurance Engineer", "Software Configuration Manager",
+    "Git Specialist", "Source Control Engineer", "CI/CD Pipeline Engineer", "DevOps Support Engineer",
+    "Senior Build Engineer", "Lead QA Engineer", "Configuration Manager",
+
+    // Network Engineering
+    "Network Engineer", "Senior Associate (Network Engineer)", "TECHNICAL SPECIALIST", "System  Administrator", "Network Administrator", "Assistant Manager (L3)– Systems (DTIS).", "Assistant Manager (L3)", 
+    "Network Security Engineer", "Network Architect", "Systems Engineer", "Firewall Engineer", 
+    "Telecommunications Engineer", "Network Analyst", "Network Infrastructure Engineer", "VoIP Engineer",
+    "Wireless Network Engineer", "Cloud Network Engineer", "Network Design Specialist", 
+    "Network Operations Center (NOC) Engineer", "Routing Specialist", "LAN/WAN Engineer", "Load Balancer Specialist",
+    "Lead Network Engineer", "Senior Network Engineer", "LINUX ADMINISTRATOR",
+
+    // Security Specialist
+    "Cybersecurity Engineer", "Security Specialist", "SOC Analyst", "Penetration Tester", "Vulnerability Analyst",
+    "IAM Specialist", "Threat Analyst", "Forensics Analyst", "Incident Response Engineer", "Application Security Engineer",
+    "Data Security Analyst", "SOC Manager", "Security Consultant", "Red Team Specialist", "Endpoint Security Engineer",
+    "Compliance Analyst", "Security Policy Analyst", "IT Risk Specialist", "Malware Analyst", "Cryptography Engineer",
+    "Lead Cybersecurity Engineer", "Senior Security Engineer", "Security Team Lead",
+
+    // Solution Architect
+    "Solution Architect", "Cloud Architect", "Enterprise Architect", "Technical Architect", "Software Architect",
+    "Infrastructure Architect", "Application Architect", "Business Solutions Architect", "Data Architect", 
+    "Platform Architect", "System Design Engineer", "Scalability Engineer", "Digital Transformation Specialist",
+    "Integration Architect", "Cloud Solutions Architect", "IT Infrastructure Architect", 
+    "Lead Architect", "Principal Architect", "Chief Architect",
+
+    // Other Relevant Technologies
+    "API Developer", "Integration Engineer", "Middleware Developer", "WebSocket Developer", "GraphQL Developer",
+    "OAuth Engineer", "Microservices Engineer", "Event-Driven Developer", "System Monitoring Engineer",
+    "DevOps Monitoring Specialist", "Telemetry Engineer", "Data Integration Specialist", "IoT Developer",
+    "Data Visualization Engineer", "Network Automation Engineer", "Messaging Specialist", "Service Mesh Specialist",
+    "Kafka Developer", "RabbitMQ Engineer", "Real-Time Data Engineer", "Alerting and Monitoring Engineer",
+    "Distributed Systems Engineer", "Resilience Engineer", "Business Intelligence Developer",
+    "Senior API Developer", "Lead Data Engineer", "Platform Lead",
+
+    // Specialized and Emerging Roles
+    "Blockchain Developer", "Quantum Computing Engineer", "Edge Computing Specialist", "Virtualization Engineer",
+    "AI Infrastructure Engineer", "Digital Twins Developer", "Augmented Reality Developer", "Robotic Process Automation (RPA) Developer",
+    "Synthetic Data Engineer", "5G Network Engineer", "Machine Vision Engineer", "Deep Learning Engineer",
+    "Bioinformatics Developer", "Medical Imaging Specialist", "Quantum Cryptographer", "Smart Contract Developer",
+    "Senior AI Engineer", "Technical Lead", "Senior Technical Lead", "Engineering Manager", "Lead Engineer",
+    "Principal Software Engineer", "Technical Project Lead", "Development Manager", "Delivery Module Lead"
+];
+
+
+  
+  
+  // // Create regex for job keywords
+  // const jobRegex = new RegExp(
+  //   `(?:${jobKeywords.join("|")})\\s*[-:–]?\\s*([\\w\\s]+)`,
+  //   "i"
+  // );
+
+  // // Try to match using job keywords
+  // const jobMatch = text.match(jobRegex);
+  // if (jobMatch) return jobMatch[1].trim();
+
+  // // If no match, try to match by predefined roles
+  // const roleRegex = new RegExp(`\\b(${predefinedRoles.join("|")})\\b`, "i");
+  // const roleMatch = text.match(roleRegex);
+  // return roleMatch ? roleMatch[1].trim() : "Not found";
+
+  // const jobRegex = new RegExp(
+  //   `(?:${jobKeywords.join("|")})\\s*[-:–]?\\s*([\\w\\s]{1,50})(?:\\n|\\r|\\s{2,})`,
+  //   "i"
+  // );
+
+  // // Try to match using job keywords on the same line only
+  // const jobMatch = text.match(jobRegex);
+  // if (jobMatch) return jobMatch[1].trim();
+
+  // // If no match by keywords, try to match by predefined roles
+  // const roleRegex = new RegExp(`\\b(${predefinedRoles.join("|")})\\b`, "i");
+  // const roleMatch = text.match(roleRegex);
+  // return roleMatch ? roleMatch[1].trim() : "Not found";
   const jobRegex = new RegExp(
-    `(?:${jobKeywords.join("|")})\\s*[-:–]?\\s*([\\w\\s]+)`,
+    `(?:${jobKeywords.join("|")})\\s*[-:–]?\\s*([\\w\\s(),]{1,100})`,
     "i"
   );
 
   const jobMatch = text.match(jobRegex);
-  return jobMatch ? jobMatch[1].trim() : "Not found";
+  if (jobMatch) return jobMatch[1].trim();
+
+  // If no match by keywords, try to match by predefined roles
+  const roleRegex = new RegExp(`\\b(${predefinedRoles.join("|")})\\b`, "i");
+  const roleMatch = text.match(roleRegex);
+  return roleMatch ? roleMatch[1].trim() : "Not found";
 }
+
+
+
 function extractExperience(text) {
   const experienceRegex = /(Experience|Professional Experience|Work History)([\s\S]*?)(Education|Skills|Projects|Certifications|$)/i;
   const match = text.match(experienceRegex);
@@ -758,7 +895,7 @@ function extractDetails(text) {
   const companyDetails = extractCompanyDetails(text);
   const certifications = extractCertifications(text);
   const languages = extractLanguages(text);
-  return { name, dob, phone, gender, maritalStatus, email, languages, education,technicalSkills, jobTitle,experience,companyDetails,certifications };
+  return { name,jobTitle, dob, phone, gender, maritalStatus, email, languages, education,technicalSkills, experience,companyDetails,certifications };
 }
 
 app.post("/api/upload", upload.single("resume"), async (req, res) => {
