@@ -606,7 +606,7 @@ function extractTechnicalSkills(text) {
 // }
 
 function extractJobTitle(text) {
-  console.log("text:",text)
+  // console.log("text:",text)
   const jobKeywords = [
     "Job Title", "Designation", "Job Position", 
     "Employment Title", "Career Position", "Professional Role", "Career Title", 
@@ -614,6 +614,7 @@ function extractJobTitle(text) {
     "Position Held", "Position Of", "Official Title", "Current Position",
     "Work Title", "Work Position", "Professional Title"
   ];
+  
   const predefinedRoles = [
     // Programming Languages
     "Software Developer", "Project Manager", ".NET Developer", ".Net Developer","Software Engineer", "Full Stack Web Developer", "Full Stack Developer","full-stack web developer", "Frontend Developer", "Backend Developer",
