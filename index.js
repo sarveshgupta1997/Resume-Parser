@@ -320,6 +320,32 @@ function extractEmailFromResume(text) {
   return email;
 }
 
+//Function for extracting Gender -------
+function extractGenderFromResume(text) {
+  // console.log(text)
+  const genderKeywords = [
+    "gender", "Gender", "sex", "Sex", "SEX",
+    "gndr", "Gndr", "GENDER",
+    "Sex/Gender", "Gender/Sex", 
+    "gender:", "sex:", "sex -", "gender -",
+    "gender identity", "Gender Identity"
+  ];
+  const lines = text.split('\n'); // Split the text into lines for easier processing
+  
+  for (const line of lines) {
+    for (const keyword of genderKeywords) {
+      const regex = new RegExp(`${keyword}\\s*[:\\-\\s.]*\\s*(male|female|other|Male|Female|Other)`, 'i'); // Regex to match gender after the keyword
+      
+      const match = line.match(regex);
+      if (match) {
+        return match[1]; // Return the matched gender
+      }
+    }
+  }
+
+  return "Not found";
+}
+
 
 // //Function for Phone No. Extraction------
 // function extractPhoneFromResume(text) {
@@ -642,26 +668,101 @@ function extractCertifications(text) {
   return ["Not found"];
 }
 
+
+// function extractLanguages(text) {
+//   const languagesKeywords = ["languages known", "language known", "language", "languages"];
+//   const lines = text.split('\n');
+//   const languages = [];
+
+//   for (const line of lines) {
+//     for (const keyword of languagesKeywords) {
+//       // Update regex to include '&' and 'and' as additional separators
+//       const regex = new RegExp(`\\b${keyword}\\b\\s*[:\\-\\s.]*\\s*([A-Za-z,\\s&]+)`, 'i');
+
+//       const match = line.match(regex);
+//       if (match) {
+//         // Split by commas, 'and', or '&', trim each item, and filter out empty items
+//         languages.push(
+//           ...match[1].split(/[,&]+|\band\b/i).map(lang => lang.trim()).filter(Boolean)
+//         );
+//         break; // Stop after finding the first matching keyword
+//       }
+//     }
+//   }
+
+//   return languages.length > 0 ? languages : ["Not found"];
+// }
+
+function extractLanguages(text) {
+  const languagesKeywords = ["Language Skills", "languages known", "language known", "language", "languages", "spoken languages", "fluent in", "languages spoken", "proficient in", 
+    "languages skills", "known languages", "spoken", "spoken proficiency", 
+    "fluent languages", "linguistic proficiency", "language proficiency", 
+    "linguistic skills", "spoken fluency", "language expertise"];
+  const precedeArrayKeywords = [
+    "programming", "programing", "skills", "coding", "technologies", "technical", 
+    "proficient", "expertise", "tools", "experience", "work experience", "capabilities",
+    "technological", "expert", "knowledge", "competencies"
+  ];
+  const lines = text.split('\n');
+  const languages = [];
+
+  for (const line of lines) {
+    let isExcluded = false;
+
+    // Check if any precedeArrayKeywords appear right before any languagesKeywords
+    for (const precedeKeyword of precedeArrayKeywords) {
+      for (const keyword of languagesKeywords) {
+        // Check if the line contains a preceding keyword directly before a languages keyword
+        const regex = new RegExp(`\\b${precedeKeyword}\\b.*\\b${keyword}\\b`, 'i');
+        if (regex.test(line)) {
+          isExcluded = true;
+          break;
+        }
+      }
+      if (isExcluded) break;
+    }
+
+    if (!isExcluded) {
+      for (const keyword of languagesKeywords) {
+        // Updated regex to match languages separated by commas, bullets, &, 'and' and ignores non-alphabet chars between
+        const regex = new RegExp(`\\b${keyword}\\b\\s*[:\\-\\s.]*\\s*([A-Za-z,\\s&]+)`, 'i');
+        const match = line.match(regex);
+        if (match) {
+          languages.push(
+            ...match[1]
+              .split(/[\s,&]+|\band\b/i)  // Splits on spaces, commas, bullets, ampersand, and 'and'
+              .map(lang => lang.trim())
+              .filter(lang => /^[A-Za-z]+$/.test(lang))  // Ensures each entry is alphabetical
+          );
+          break;
+        }
+      }
+    }
+  }
+
+  return languages.length > 0 ? languages : ["Not found"];
+}
+
 function extractDetails(text) {
   const name = extractNameFromResume(text);
   const dob = extractDOB(text);
   const phone = extractPhoneFromResume(text);
   const email = extractEmailFromResume(text);
-  const gender = text.match(/Gender\s*:\s*(\w+)/)?.[1]?.trim() || "Not found";
+  const gender = extractGenderFromResume(text);
+  // const gender = text.match(/Gender\s*:\s*(\w+)/)?.[1]?.trim() || "Not found";
   const maritalStatus = extractMaritalStatus(text);
   const technicalSkills = extractTechnicalSkills(text);
- const education = extractEducation(text)
-    const jobTitle = extractJobTitle(text);
+  const education = extractEducation(text);
+  const jobTitle = extractJobTitle(text);
   const experience = extractExperience(text);
-  // console.log(experience,'eeeeeeeeeeeeeeeee')
   const companyDetails = extractCompanyDetails(text);
   const certifications = extractCertifications(text);
-  return { name, dob, phone, gender, maritalStatus, email, education,technicalSkills, jobTitle,experience,companyDetails,certifications };
+  const languages = extractLanguages(text);
+  return { name, dob, phone, gender, maritalStatus, email, languages, education,technicalSkills, jobTitle,experience,companyDetails,certifications };
 }
 
 app.post("/api/upload", upload.single("resume"), async (req, res) => {
   const file = req.file;
-  // console.log("Uploaded File:", req.file);
 
   if (!file) {
     return res.status(400).json({ error: "No file uploaded" });
