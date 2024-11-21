@@ -557,6 +557,124 @@ function extractEducation(text) {
 //   return skills;
 // }
 
+// function extractTechnicalSkills(text) {
+//   if (!text || typeof text !== "string") {
+//     throw new Error("Invalid input: text must be a non-empty string");
+//   }
+
+//   const keywords = [
+//     "Technical Skills",
+//     "Skills",
+//     "Core Skills",
+//     "Relevant Skills",
+//     "Tech Stack",
+//   ];
+
+//   const predefinedSkills = [
+//     // Programming Languages
+//     "C++", "Java", "JavaScript", "Python", "HTML", "HTML5", "CSS", "C",
+//     "TypeScript", "PHP", "Ruby", "Go", "Swift", "Kotlin", "Rust", "Scala",
+//     "VB.NET", "C#", "F#", "Perl", "R", "Matlab", "Data Structures And Algorithms",
+//     // Frontend Development
+//     "React JS", "React", "Angular", "Vue.js", "Svelte", "jQuery", "jQuery", "Bootstrap",
+//     "TailwindCSS", "Material-UI", "Ant Design", "Sass", "Less",
+
+//     // Backend Development
+//     "Node.js", "Django", "Flask", "Express.js", "Ruby on Rails",
+//     "Spring", "Spring Boot", "Spring MVC", "Hibernate", "Laravel",
+//     "CodeIgniter", "Symfony", "ASP.NET Core", "Koa.js", "FastAPI",
+
+//     // Databases
+//     "MySQL", "PostgreSQL", "MongoDB", "Oracle", "Firebase", "SQLite", "SQL",
+//     "Redis", "Cassandra", "Elasticsearch", "MariaDB", "DynamoDB", "CockroachDB",
+
+//     // Cloud and DevOps
+//     "AWS", "Azure", "Google Cloud", "Docker", "Kubernetes", "Terraform",
+//     "Jenkins", "Ansible", "Puppet", "Chef", "CloudFormation", "Heroku",
+//     "Netlify", "Vercel", "CircleCI", "GitHub Actions",
+
+//     // Tools and Version Control
+//     "Git", "GitHub", "GitLab", "Bitbucket", "VS Code", "Eclipse",
+//     "IntelliJ IDEA", "PyCharm", "Xcode", "NetBeans", "Postman", "Fiddler",
+//     "Wireshark", "JIRA", "Confluence", "Maven", "Gradle", "NPM", "Yarn",
+
+//     // Network Engineering
+//     "Cisco", "Juniper", "BGP", "OSPF", "IPSec", "VPN", "Firewall", "Load Balancer",
+//     "Network Security", "F5 BIG-IP", "NGINX", "HAProxy", "TCP/IP", "Ethernet", "DNS",
+//     "DHCP", "LAN", "WAN", "SD-WAN", "Packet Tracing", "Subnetting", "SNMP", "VLAN", "VTP", "HSRP", "VRRP", "STP",
+//     "MPLS", "MPLS L2 VPN", "MPLS L3 VPN", "Routing", "Switching", "Configuration", "Protocols",
+//     "BGP", "OSPF", "EIGRP", "Access lists", "Extended IP access lists", "Standard IP access lists", "BGP Configuration", " VPN Configuration", "OSPF Configuration",
+//     "STP Configuration", "NAT Configuration", "Troubleshooting",
+
+//     // Security Specialist
+//     "SSL/TLS", "WAF", "DDoS Mitigation", "SOC Operations", "SIEM",
+//     "F5 BIG-IP LTM", "F5 ASM", "F5 APM", "Zero Trust", "IAM", "Penetration Testing",
+//     "Vulnerability Assessment", "IDS/IPS", "Threat Hunting", "Endpoint Security",
+//     "OWASP", "SANS", "CyberArk", "Fortinet", "Palo Alto Networks", "Splunk",
+
+//     // Solution Architect
+//     "Microservices", "Event-Driven Architecture", "Monolithic Architecture",
+//     "SOA", "API Gateway", "Load Balancing", "High Availability", "Disaster Recovery",
+//     "Scalability", "Elasticity", "CI/CD Pipelines", "Serverless",
+//     "Cost Optimization", "Cloud Migration", "System Design", "Business Continuity",
+
+//     // Other Relevant Technologies
+//     "GraphQL", "REST APIs", "WebSockets", "OAuth", "JWT", "AJAX",
+//     "WebRTC", "OpenShift", "Kong API Gateway", "Istio", "Apache Kafka",
+//     "RabbitMQ", "ActiveMQ", "Elastic Stack", "Prometheus", "Grafana",
+//     "Logstash", "Kibana", "New Relic", "Datadog", "PagerDuty"
+//   ];
+
+//   const predefinedSkillsLower = predefinedSkills.map(skill => skill.toLowerCase());
+
+//   const keywordRegex = new RegExp(
+//     `(${keywords.join("|")})\\s*[:\\-]?\\s*([\\w\\W]+?)(?=\\n\\n|$)`,
+//     "gi"
+//   );
+
+//   const matches = [];
+//   let match;
+
+//   while ((match = keywordRegex.exec(text)) !== null) {
+//     matches.push({
+//       keyword: match[1],
+//       content: match[2],
+//     });
+//   }
+
+//   if (!matches || matches.length === 0) {
+//     // console.log("No matches found in the text.");
+//     return { foundKeywords: [], extractedSkills: [] };
+//   }
+
+//   const foundKeywords = matches.map(match => match.keyword);
+//   // console.log("Found Keywords:", foundKeywords);
+
+//   const extractedSkills = matches
+//     .flatMap(match => {
+//       if (match && match.content) {
+//         return match.content.split(/[\n,]/); // Split skills by newline or comma
+//       }
+//       console.warn("Skipping invalid match:", match);
+//       return [];
+//     })
+//     .map(skill => skill.trim().toLowerCase())
+//     .filter(skill => predefinedSkillsLower.includes(skill));
+
+//   // Ensure unique skills (deduplicate the list)
+//   const uniqueSkills = Array.from(new Set(extractedSkills)).map(skill =>
+//     predefinedSkills.find(predefined => predefined.toLowerCase() === skill)
+//   );
+
+//   // console.log("Extracted Skills:", uniqueSkills);
+
+//   return { foundKeywords, extractedSkills: uniqueSkills };
+// }
+
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // Escapes special regex characters
+}
+
 function extractTechnicalSkills(text) {
   if (!text || typeof text !== "string") {
     throw new Error("Invalid input: text must be a non-empty string");
@@ -565,67 +683,52 @@ function extractTechnicalSkills(text) {
   const keywords = [
     "Technical Skills",
     "Skills",
+    "Network Skills",
     "Core Skills",
     "Relevant Skills",
     "Tech Stack",
+    "Technical Profile",
+    "Software Skills (Technical and project management )",
   ];
 
   const predefinedSkills = [
     // Programming Languages
-    "C++", "Java", "JavaScript", "Python", "HTML", "HTML5", "CSS", "C",
+    "C++", "Java", "JavaScript", "Python", "HTML", "HTML 5", "CSS", "C","J2SE","J2EE",
     "TypeScript", "PHP", "Ruby", "Go", "Swift", "Kotlin", "Rust", "Scala",
-    "VB.NET", "C#", "F#", "Perl", "R", "Matlab", "Data Structures And Algorithms",
+    "VB.NET", "C#", "F#", "Perl",  "Matlab", "Data Structures And Algorithms","Shell Scripting",
     // Frontend Development
-    "React JS", "React", "Angular", "Vue.js", "Svelte", "jQuery", "jQuery", "Bootstrap",
-    "TailwindCSS", "Material-UI", "Ant Design", "Sass", "Less",
-
+    "React JS", "React","React.js", "AngularJs", "Vue.js", "Svelte", "jQuery", "Bootstrap","J-Query",
+    "TailwindCSS", "Material-UI", "Ant Design", "Sass", "Less","Ajax",
     // Backend Development
-    "Node.js", "Django", "Flask", "Express.js", "Ruby on Rails",
-    "Spring", "Spring Boot", "Spring MVC", "Hibernate", "Laravel",
-    "CodeIgniter", "Symfony", "ASP.NET Core", "Koa.js", "FastAPI",
-
+    "Node.js", "Django", "Flask", "Express.js", "Ruby on Rails", "Spring", "DHCP","DNS Servers",
+    "Spring Boot", "Spring MVC", "Hibernate", "Laravel", "CodeIgniter", "ASP.mvc",
+    "Symfony","Asp.net", "ASP.NET Core", "Koa.js", "FastAPI","VB.net","C#.net",
     // Databases
-    "MySQL", "PostgreSQL", "MongoDB", "Oracle", "Firebase", "SQLite", "SQL",
-    "Redis", "Cassandra", "Elasticsearch", "MariaDB", "DynamoDB", "CockroachDB",
-
+    "MySQL", "PostgreSQL", "MongoDB", "Oracle", "Firebase", "SQLite", "SQL","My-Sql",
+    "Redis", "Cassandra", "Elasticsearch", "MariaDB", "DynamoDB", "CockroachDB","Postgray",
     // Cloud and DevOps
     "AWS", "Azure", "Google Cloud", "Docker", "Kubernetes", "Terraform",
-    "Jenkins", "Ansible", "Puppet", "Chef", "CloudFormation", "Heroku",
+    "Jenkins", "Ansible", "Puppet", "Chef", "CloudFormation", "Heroku", 
     "Netlify", "Vercel", "CircleCI", "GitHub Actions",
-
     // Tools and Version Control
-    "Git", "GitHub", "GitLab", "Bitbucket", "VS Code", "Eclipse",
-    "IntelliJ IDEA", "PyCharm", "Xcode", "NetBeans", "Postman", "Fiddler",
-    "Wireshark", "JIRA", "Confluence", "Maven", "Gradle", "NPM", "Yarn",
-
-    // Network Engineering
-    "Cisco", "Juniper", "BGP", "OSPF", "IPSec", "VPN", "Firewall", "Load Balancer",
-    "Network Security", "F5 BIG-IP", "NGINX", "HAProxy", "TCP/IP", "Ethernet", "DNS",
-    "DHCP", "LAN", "WAN", "SD-WAN", "Packet Tracing", "Subnetting", "SNMP", "VLAN", "VTP", "HSRP", "VRRP", "STP",
-    "MPLS", "MPLS L2 VPN", "MPLS L3 VPN", "Routing", "Switching", "Configuration", "Protocols",
-    "BGP", "OSPF", "EIGRP", "Access lists", "Extended IP access lists", "Standard IP access lists", "BGP Configuration", " VPN Configuration", "OSPF Configuration",
-    "STP Configuration", "NAT Configuration", "Troubleshooting",
-
-    // Security Specialist
-    "SSL/TLS", "WAF", "DDoS Mitigation", "SOC Operations", "SIEM",
-    "F5 BIG-IP LTM", "F5 ASM", "F5 APM", "Zero Trust", "IAM", "Penetration Testing",
-    "Vulnerability Assessment", "IDS/IPS", "Threat Hunting", "Endpoint Security",
-    "OWASP", "SANS", "CyberArk", "Fortinet", "Palo Alto Networks", "Splunk",
-
-    // Solution Architect
-    "Microservices", "Event-Driven Architecture", "Monolithic Architecture",
-    "SOA", "API Gateway", "Load Balancing", "High Availability", "Disaster Recovery",
-    "Scalability", "Elasticity", "CI/CD Pipelines", "Serverless",
-    "Cost Optimization", "Cloud Migration", "System Design", "Business Continuity",
-
+    "Git", "GitHub", "GitLab", "Bitbucket", "VS Code", "Eclipse", "J-Boss",
+    "IntelliJ IDEA", "PyCharm", "Xcode", "NetBeans", "Postman", "Fiddler", 
+    "Wireshark", "JIRA", "Confluence", "Maven", "Gradle", "NPM", "Yarn","CMS",
+    //Other Network Skills 
+    "LAN"," WAN", "SNMP", "DNS" ,"VLAN", "VTP", "HSRP", "VRRP", "STP",
+    "MPLS", "MPLS L2 VPN", "MPLS L3 VPN","Routing Configuration ", "Switching Configuration", "Configuration", "Protocols",
+    "BGP", "OSPF", "EIGRP","BGP","OSPF","STP","NAT",
     // Other Relevant Technologies
-    "GraphQL", "REST APIs", "WebSockets", "OAuth", "JWT", "AJAX",
-    "WebRTC", "OpenShift", "Kong API Gateway", "Istio", "Apache Kafka",
-    "RabbitMQ", "ActiveMQ", "Elastic Stack", "Prometheus", "Grafana",
-    "Logstash", "Kibana", "New Relic", "Datadog", "PagerDuty"
+    "GraphQL", "REST APIs", "WebSockets", "OAuth", "JWT", "AJAX", "Linux RHEL 7.0/8.0","CentOS","YUM","RPM",
+    "WebRTC", "OpenShift", "Kong API Gateway", "Istio", "Apache Kafka", "LVM","Splunk", "Dynatrace", "AppDynamics", "SVN",
+    "RabbitMQ", "ActiveMQ", "Elastic Stack", "Prometheus dashboard", "Grafana","FTP", "NFS","SAMBA","Jenkins", "Maven", "Docker", 
+    "Pivotal Cloud Foundry", "Apache Tomcat", "Hazel cast", "Cassandra", "JIRA", "Target deployment port (IBM Tool)", 
+    "Windows", "Linux", "Mac", "Agile" , "Scrum", "IP Configuration","FIREWALL", "SELINUX", "TCP wrappers","Microservices",
+    "SVN","CVS","BigBucket"
   ];
 
-  const predefinedSkillsLower = predefinedSkills.map(skill => skill.toLowerCase());
+  // Escape special characters in predefined skills
+  const escapedSkills = predefinedSkills.map(escapeRegExp);
 
   const keywordRegex = new RegExp(
     `(${keywords.join("|")})\\s*[:\\-]?\\s*([\\w\\W]+?)(?=\\n\\n|$)`,
@@ -642,33 +745,38 @@ function extractTechnicalSkills(text) {
     });
   }
 
-  if (!matches || matches.length === 0) {
-    // console.log("No matches found in the text.");
-    return { foundKeywords: [], extractedSkills: [] };
-  }
-
-  const foundKeywords = matches.map(match => match.keyword);
-  // console.log("Found Keywords:", foundKeywords);
-
-  const extractedSkills = matches
-    .flatMap(match => {
+  const foundKeywords = matches.map((match) => match.keyword);
+  const extractedSkillsFromKeywords = matches
+    .flatMap((match) => {
       if (match && match.content) {
-        return match.content.split(/[\n,]/); // Split skills by newline or comma
+        return match.content.split(/[\n,]/);
       }
-      console.warn("Skipping invalid match:", match);
       return [];
     })
-    .map(skill => skill.trim().toLowerCase())
-    .filter(skill => predefinedSkillsLower.includes(skill));
+    .map((skill) => skill.trim().toLowerCase()) // Normalize case
+    .filter((skill) =>
+      escapedSkills.some((escapedSkill) => new RegExp(`^${escapedSkill}$`, "i").test(skill))
+    );
 
-  // Ensure unique skills (deduplicate the list)
-  const uniqueSkills = Array.from(new Set(extractedSkills)).map(skill =>
-    predefinedSkills.find(predefined => predefined.toLowerCase() === skill)
+  // Ensure unique skills from keyword matches
+  const uniqueSkillsFromKeywords = Array.from(new Set(extractedSkillsFromKeywords)).map((skill) =>
+    predefinedSkills.find((predefined) => predefined.toLowerCase() === skill)
   );
 
-  // console.log("Extracted Skills:", uniqueSkills);
+  // If no keywords were found, perform a full-text scan for skills
+  let uniqueSkillsFromText = [];
+  if (uniqueSkillsFromKeywords.length === 0) {
+    uniqueSkillsFromText = predefinedSkills.filter((skill) =>
+      new RegExp(`\\b${escapeRegExp(skill)}\\b`, "i").test(text)
+    );
+  }
 
-  return { foundKeywords, extractedSkills: uniqueSkills };
+  const finalExtractedSkills =
+    uniqueSkillsFromKeywords.length > 0
+      ? uniqueSkillsFromKeywords
+      : uniqueSkillsFromText;
+
+  return { foundKeywords, extractedSkills: finalExtractedSkills };
 }
 
 // function extractJobTitle(text) {
@@ -819,23 +927,23 @@ function extractJobTitle(text) {
 
 
 
-function extractExperience(text) {
-  const experienceRegex = /(Experience|Professional Experience|Work History)([\s\S]*?)(Education|Skills|Projects|Certifications|$)/i;
-  const match = text.match(experienceRegex);
+// function extractExperience(text) {
+//   const experienceRegex = /(Experience|Professional Experience|Work History)([\s\S]*?)(Education|Skills|Projects|Certifications|$)/i;
+//   const match = text.match(experienceRegex);
 
-  if (match) {
-    let experienceDetails = match[2].trim();  // Extract the experience content
-    // Clean up the content:
-    experienceDetails = experienceDetails.replace(/\s{2,}/g, " ");  // Replace multiple spaces with a single space
-    experienceDetails = experienceDetails.replace(/;+/g, ";");  // Replace multiple semicolons with a single semicolon
-    experienceDetails = experienceDetails.replace(/(\r?\n){2,}/g, "\n");  // Replace multiple line breaks with a single one
-    experienceDetails = experienceDetails.replace(/^\n+/g, "").replace(/\n+$/g, "");  // Remove leading/trailing line breaks
+//   if (match) {
+//     let experienceDetails = match[2].trim();  // Extract the experience content
+//     // Clean up the content:
+//     experienceDetails = experienceDetails.replace(/\s{2,}/g, " ");  // Replace multiple spaces with a single space
+//     experienceDetails = experienceDetails.replace(/;+/g, ";");  // Replace multiple semicolons with a single semicolon
+//     experienceDetails = experienceDetails.replace(/(\r?\n){2,}/g, "\n");  // Replace multiple line breaks with a single one
+//     experienceDetails = experienceDetails.replace(/^\n+/g, "").replace(/\n+$/g, "");  // Remove leading/trailing line breaks
 
-    return experienceDetails;
-  }
+//     return experienceDetails;
+//   }
 
-  return "No detailed experience information found";
-}
+//   return "No detailed experience information found";
+// }
 
 // function extractExperience(text) {
 //   console.log("text::",text)
@@ -1078,6 +1186,69 @@ function extractExperience(text) {
 //   return workExperience;
 
 // }
+function extractExperience(text) {
+  console.log("text::", text)
+
+  const experienceKeywords = [
+    "Experience", "Work Experience", "Professional Experience", "Work History", 
+    "Employment History", "Career Summary", "Relevant Experience", "Previous Experience", 
+    "Professional Background", "Job History", "Project Experience", "Employment Experience", 
+    "Professional History", "Career Highlights", "Experience Summary", "Work Background", 
+    "Professional Summary", "Roles and Responsibilities", "Positions Held", "Past Positions"
+  ];
+
+  const companyNamesKeywords = [
+    "private limited", "pvt. ltd.", "pvt ltd", "limited", "solutions", 
+    "technologies", "Ltd Pvt", "Inc", "corporation", "LLC", "group"
+  ];
+
+  // Enhanced regex for dates
+  const dateRegex = /\b(?:\d{4}\/\d{2}|[A-Za-z]{3}-\d{4}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s*\d{4})\b/g;
+
+  // Split lines and trim whitespace
+  const lines = text.split(/\r?\n/).map(line => line.trim()).filter(line => line);
+
+  const results = [];
+  let currentCompany = null;
+  let currentRole = null;
+  let startDate = null;
+  let endDate = null;
+
+  lines.forEach(line => {
+    // Check for date range
+    const dates = line.match(dateRegex);
+    if (dates && dates.length >= 1) {
+      startDate = dates[0];
+      endDate = dates[1] || 'Present';
+    }
+
+    // Check for roles
+    const matchingRole = predefinedRoles.find(role => line.toLowerCase().includes(role.toLowerCase()));
+    if (matchingRole) {
+      currentRole = matchingRole;
+    }
+
+    // Check for company names
+    if (companyNamesKeywords.some(keyword => line.toLowerCase().includes(keyword.toLowerCase()))) {
+      if (currentCompany) {
+        // Push the previous entry
+        results.push({ company: currentCompany, role: currentRole, startDate, endDate });
+      }
+      currentCompany = line.split("as")[0]?.trim() || null; // Extract company name
+      currentRole = predefinedRoles.find(role => line.toLowerCase().includes(role.toLowerCase())) || null; // Extract role
+      startDate = null;
+      endDate = null;
+    }
+  });
+
+  // Push the last entry
+  if (currentCompany) {
+    results.push({ company: currentCompany, role: currentRole, startDate, endDate });
+  }
+
+  return results;
+}
+
 
 
 function extractCompanyDetails(text) {
@@ -1266,6 +1437,50 @@ function extractLanguages(text) {
 
 }
 
+// for bullet point logic
+// function extractLanguages(text) {
+//   const languagesArray = [
+//     "Hindi", "English", "Bengali", "Marathi", "Telugu", "Tamil", "Gujarati",
+//     "Urdu", "Kannada", "Odia", "Malayalam", "Punjabi", "Assamese", "Maithili",
+//     "Santali", "Kashmiri", "Nepali", "Konkani", "Sanskrit", "Sindhi", "Dogri",
+//     "Manipuri", "Bodo", "Santhali", "Tulu", "Marwari", "Bhojpuri", "Awadhi",
+//     "Haryanvi", "Rajasthani", "Chhattisgarhi", "Mundari", "Khasi", "Mizo",
+//     "Garo", "Tripuri", "Ho", "Ladakhi", "Garhwali", "Kumaoni"
+//   ];
+//   const languagesKeywords = ["Language Skills", "languages known", "language known", "language", "languages", "spoken languages", "fluent in", "languages spoken", "proficient in",
+//     "languages skills", "known languages", "spoken", "spoken proficiency",
+//     "fluent languages", "linguistic proficiency", "language proficiency",
+//     "linguistic skills", "spoken fluency", "language expertise"];
+  
+//   // Normalize text by replacing bullets and excess whitespace
+//   const normalizedText = text.replace(//g, '').replace(/\s+/g, ' ').trim();
+
+//   // Check for language keywords in text
+//   const keywordRegex = new RegExp(`\\b(${languagesKeywords.join('|')})\\b`, 'i');
+//   if (!keywordRegex.test(normalizedText)) return ["Not found"];
+
+//   // Extract languages
+//   const regex = new RegExp(`\\b(?:${languagesKeywords.join('|')})\\b.*?([A-Za-z,\\s&]+)`, 'i');
+//   const matches = normalizedText.match(regex);
+
+//   if (matches) {
+//     const extractedLanguages = matches[1]
+//       .split(/[\s,&]+|\band\b/i) // Split on spaces, commas, bullets, ampersand, and "and"
+//       .map(lang => lang.trim())
+//       .filter(lang => /^[A-Za-z]+$/.test(lang)); // Only keep valid alphabetical entries
+
+//     // Filter extracted languages against the languagesArray
+//     const validLanguages = extractedLanguages
+//       .map(lang => lang.charAt(0).toUpperCase() + lang.slice(1).toLowerCase())
+//       .filter(lang => languagesArray.includes(lang));
+
+//     return validLanguages.length > 0 ? validLanguages : ["Not found"];
+//   }
+
+//   return ["Not found"];
+// }
+
+
 function extractDetails(text) {
   const name = extractNameFromResume(text);
   const dob = extractDOB(text);
@@ -1281,7 +1496,7 @@ function extractDetails(text) {
   const companyDetails = extractCompanyDetails(text);
   const certifications = extractCertifications(text);
   const languages = extractLanguages(text);
-  return { name, experience, jobTitle, dob, phone, gender, maritalStatus, email, languages, education, technicalSkills, companyDetails, certifications };
+  return { languages,  name, experience, jobTitle, dob, phone, gender, maritalStatus, email, education, technicalSkills, companyDetails, certifications, text };
 }
 
 app.post("/api/upload", upload.single("resume"), async (req, res) => {
