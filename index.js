@@ -1480,6 +1480,82 @@ function extractLanguages(text) {
 //   return ["Not found"];
 // }
 
+// for bullet point logic 2nd
+function extractLanguages(text) {
+  const languagesArray = [
+    "Hindi", "English", "Bengali", "Marathi", "Telugu", "Tamil", "Gujarati",
+    "Urdu", "Kannada", "Odia", "Malayalam", "Punjabi", "Assamese", "Maithili",
+    "Santali", "Kashmiri", "Nepali", "Konkani", "Sanskrit", "Sindhi", "Dogri",
+    "Manipuri", "Bodo", "Santhali", "Tulu", "Marwari", "Bhojpuri", "Awadhi",
+    "Haryanvi", "Rajasthani", "Chhattisgarhi", "Mundari", "Khasi", "Mizo",
+    "Garo", "Tripuri", "Ho", "Ladakhi", "Garhwali", "Kumaoni"
+  ];
+
+  const languagesKeywords = [
+    "Language Skills", "languages known", "language known", "language", "languages",
+    "spoken languages", "fluent in", "languages spoken", "proficient in",
+    "languages skills", "known languages", "spoken", "spoken proficiency",
+    "fluent languages", "linguistic proficiency", "language proficiency",
+    "linguistic skills", "spoken fluency", "language expertise"
+  ];
+
+  const precedeArrayKeywords = [
+    "programming", "programing", "skills", "coding", "technologies", "technical",
+    "proficient", "expertise", "tools", "experience", "work experience", "capabilities",
+    "technological", "expert", "knowledge", "competencies"
+  ];
+
+  const lines = text.split('\n');
+  const languages = [];
+
+  for (const line of lines) {
+    let isExcluded = false;
+
+    // Exclude lines with programming/technical context
+    for (const precedeKeyword of precedeArrayKeywords) {
+      for (const keyword of languagesKeywords) {
+        const regex = new RegExp(`\\b${precedeKeyword}\\b.*\\b${keyword}\\b`, 'i');
+        if (regex.test(line)) {
+          isExcluded = true;
+          break;
+        }
+      }
+      if (isExcluded) break;
+    }
+
+    if (!isExcluded) {
+      // Check for keywords and extract language list
+      for (const keyword of languagesKeywords) {
+        const regex = new RegExp(`\\b${keyword}\\b[:\\-\\s.]*([A-Za-z,\\s&]+)`, 'i');
+        const match = line.match(regex);
+        if (match) {
+          languages.push(
+            ...match[1]
+              .split(/[\s,&]+|\band\b/i)
+              .map(lang => lang.trim())
+              .filter(lang => /^[A-Za-z]+$/.test(lang))
+          );
+        }
+      }
+
+      // Handle lines with only languages (e.g., bullet points or separated entries)
+      const languageOnlyRegex = new RegExp(`\\b(${languagesArray.join('|')})\\b`, 'i');
+      const languageMatch = line.match(languageOnlyRegex);
+      if (languageMatch) {
+        languages.push(languageMatch[1]);
+      }
+    }
+  }
+
+  // Normalize case and filter valid languages
+  const validLanguages = languages
+    .map(lang => lang.charAt(0).toUpperCase() + lang.slice(1).toLowerCase())
+    .filter(lang => languagesArray.includes(lang));
+
+  return validLanguages.length > 0 ? Array.from(new Set(validLanguages)) : ["Not found"];
+}
+
+
 
 function extractDetails(text) {
   const name = extractNameFromResume(text);
