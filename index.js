@@ -30,22 +30,8 @@ const upload = multer({
     cb(new Error("Error: File type not supported"));
   },
 });
-//Function for extracting name ---------
-function extractNameFromResume(text) {
-  const nameFromKeyword = extractNameUsingKeywords(text);
 
-  if (nameFromKeyword !== "Not found") {
-    return nameFromKeyword;
-  }
 
-  const nameFromTopLines = extractNameFromTopLines(text);
-
-  if (nameFromTopLines) {
-    return nameFromTopLines;
-  }
-
-  return "Not found";
-}
 const predefinedRoles = [
   // Programming Languages
   "Software Developer", "Project Manager", ".NET Developer", ".Net Developer", "Software Engineer", "Full Stack Web Developer", "Full Stack Developer", "full-stack web developer", "Frontend Developer", "Backend Developer",
@@ -126,6 +112,287 @@ const predefinedRoles = [
   "Principal Software Engineer", "Technical Project Lead", "Development Manager", "Delivery Module Lead"
 ];
 
+// //Function for extracting name ---------
+// function extractNameFromResume(text) {
+//   const nameFromKeyword = extractNameUsingKeywords(text);
+
+//   if (nameFromKeyword !== "Not found") {
+//     return nameFromKeyword;
+//   }
+
+//   const nameFromTopLines = extractNameFromTopLines(text);
+
+//   if (nameFromTopLines) {
+//     return nameFromTopLines;
+//   }
+
+//   return "Not found";
+// }
+
+// // function extractNameUsingKeywords(text) {
+// //   const nameKeywords = [
+// //     "Name",
+// //     "Candidate Name",
+// //     "Applicant Name",
+// //     "Full Name",
+// //   ];
+
+// //   const prevWords = [
+// //     "project", "college", "father", "father's", "fathers", "mother", "mother's", "spouse",
+// //     "spouse's", "husband", "husband's", "wife", "wife's", "school", "university",
+// //     "company", "company's", "organization", "organization's", "institute",
+// //     "institute's", "employer", "employer's", "department", "department's",
+// //     "branch", "branch's", "division", "division's", "team", "team's", "supervisor",
+// //     "supervisor's", "manager", "manager's", "head", "head's", "coordinator",
+// //     "coordinator's", "contact", "contact's", "relation", "relation's", "reference",
+// //     "reference's", "next of kin", "guardian", "guardian's", "emergency contact",
+// //     "emergency contact's", "advisor", "advisor's", "tutor", "tutor's", "mentor",
+// //     "mentor's", "teacher", "teacher's", "guide", "guide's", "counselor", "counselor's"
+// //   ];
+
+// //   const lines = text.split("\n");
+
+// //   for (let line of lines) {
+// //     // Convert the line to lowercase for case-insensitive matching
+// //     const lowerLine = line.toLowerCase();
+
+// //     for (let keyword of nameKeywords) {
+// //       // Check if the line contains the keyword and does not contain any of the prevWords
+// //       if (line.includes(keyword) && !prevWords.some(prev => lowerLine.includes(prev))) {
+// //         const parts = line.split(":");
+// //         if (parts.length > 1) {
+// //           const name = parts[1].trim();
+// //           return validateName(name) ? name : "Not found";
+// //         }
+// //       }
+// //     }
+// //   }
+
+// //   return "Not found";
+// // }
+// function extractNameUsingKeywords(text) {
+//   const nameKeywords = [
+//     "Name",
+//     "Candidate Name",
+//     "Applicant Name",
+//     "Full Name",
+//   ];
+
+//   const prevWords = [
+//     "project", "college", "father", "father's", "fathers", "mother", "mother's", "spouse",
+//     "spouse's", "husband", "husband's", "wife", "wife's", "school", "university",
+//     "company", "company's", "organization", "organization's", "institute",
+//     "institute's", "employer", "employer's", "department", "department's",
+//     "branch", "branch's", "division", "division's", "team", "team's", "supervisor",
+//     "supervisor's", "manager", "manager's", "head", "head's", "coordinator",
+//     "coordinator's", "contact", "contact's", "relation", "relation's", "reference",
+//     "reference's", "next of kin", "guardian", "guardian's", "emergency contact",
+//     "emergency contact's", "advisor", "advisor's", "tutor", "tutor's", "mentor",
+//     "mentor's", "teacher", "teacher's", "guide", "guide's", "counselor", "counselor's"
+//   ];
+
+//   const lines = text.split("\n");
+//   let previousWordsBuffer = []; // Buffer to store the last few words
+
+//   for (let line of lines) {
+//     // Convert the line to lowercase for case-insensitive matching
+//     const lowerLine = line.toLowerCase();
+
+//     // Add the last 5 words of the current line to the buffer
+//     const currentWords = lowerLine.trim().split(/\s+/).slice(-5); // Extract last 5 words
+//     previousWordsBuffer.push(...currentWords);
+
+//     // Limit the buffer size to 5 words
+//     if (previousWordsBuffer.length > 5) {
+//       previousWordsBuffer = previousWordsBuffer.slice(-5); // Keep only the last 5 words
+//     }
+
+//     for (let keyword of nameKeywords) {
+//       // Check if the line contains the keyword and does not match with any `prevWords` in the buffer
+//       if (
+//         line.includes(keyword) &&
+//         !previousWordsBuffer.some((prev) => lowerLine.includes(prev))
+//       ) {
+//         const parts = line.split(":");
+//         if (parts.length > 1) {
+//           const name = parts[1].trim();
+//           return validateName(name) ? name : "Not found";
+//         }
+//       }
+//     }
+//   }
+
+//   return "Not found";
+// }
+
+// // function extractNameFromTopLines(text) {
+// //   // List of keywords to skip when looking for names at the top
+// //   const skipsKeywords = [
+// //     "Resume", "Biodata", "CURRICULUM VITAE", "CV", "Profile", "Introduction",
+// //     "Summary", "Professional Summary", "Objective", "Cover Letter", "Personal Information",
+// //     "Candidate Profile", "Details", "Applicant Profile", "Application", "Applicant",
+// //     "Contact Information", "Contact Details", "Personal Details", "Name", "Title",
+// //     "Experience", "Skills", "Technical Skills", "Education", "Projects", "Certifications",
+// //     "Training", "Achievements", "Professional Background",
+
+// //     // Common roles in tech and other domains
+// //     "Developer", "Engineer", "Manager", "Consultant", "Analyst", "Administrator",
+// //     "Specialist", "Coordinator", "Operator", "Support", "Executive", "HR", "Sales",
+// //     "Marketing", "Finance", "Accounts", "Operations", "Testing", "Tester", "QA",
+// //     "Quality Assurance", "Product Owner", "Product Manager", "Scrum Master", "Team Lead",
+
+// //     // Specific tech roles and technologies
+// //     "Java Developer", "Java Spring Boot Developer", "JavaScript Developer",
+// //     "Frontend Developer", "Backend Developer", "Full Stack Developer", "Node.js Developer",
+// //     "Python Developer", "Dotnet Developer", ".NET Developer", "Angular Developer",
+// //     "React Developer", "Vue Developer", "PHP Developer", "SQL Developer", "Data Scientist",
+// //     "Machine Learning Engineer", "AI Engineer", "Cloud Engineer", "DevOps Engineer",
+// //     "Systems Administrator", "IT Support", "Software Engineer", "Software Developer",
+// //     "Web Developer", "Mobile Developer", "iOS Developer", "Android Developer",
+// //     "Technical Support", "Helpdesk", "Customer Support", "Customer Service",
+
+// //     // Additional qualifiers
+// //     "Immediate Joiner", "Looking for Opportunities", "Open to Work", "Available Immediately",
+// //     "Notice Period", "Freelancer", "Intern", "Contractor", "Consultant",
+// //     "Temporary", "Full-time", "Part-time", "Remote Worker", "Onsite", "Hybrid"
+// //   ];
+
+
+// //   const lines = text.split("\n");
+
+// //   for (let i = 0; i < Math.min(5, lines.length); i++) {
+// //     // Skip lines containing any of the skip keywords
+// //     if (skipsKeywords.some(keyword => lines[i].toUpperCase().includes(keyword.toUpperCase()))) {
+// //       continue;
+// //     }
+
+// //     // console.log( "lines: ",lines);
+// //     const words = lines[i].trim().split(/\s+/);
+
+// //     // Filter capitalized words
+// //     const capitalizedWords = words.filter((word) =>
+// //       /^[A-Z][a-zA-Z]+$/.test(word) || /^[A-Z]+$/.test(word)
+// //       // /^[A-Z][a-zA-Z]+$/.test(word)
+// //     );
+// //     // console.log("capitalizedWords: ",capitalizedWords, "Words: ",words)
+// //     if (
+// //       capitalizedWords.length === 2 ||
+// //       capitalizedWords.length === 3 ||
+// //       capitalizedWords.length === 4
+// //     ) {
+// //       const potentialName = capitalizedWords.join(" ");
+
+// //       if (validateName(potentialName)) {
+// //         return potentialName;
+// //       }
+// //     }
+// //   }
+
+// //   return null;
+// // }
+
+// // // best till now
+// function extractNameFromTopLines(text) {
+//   // List of keywords to skip when looking for names at the top
+//   const skipsKeywords = [
+//     "Resume", "Biodata", "CURRICULUM VITAE", "CV", "Profile", "Introduction",
+//     "Summary", "Professional Summary", "Objective", "Cover Letter", "Personal Information",
+//     "Candidate Profile", "Details", "Applicant Profile", "Application", "Applicant",
+//     "Contact Information", "Contact Details", "Personal Details", "Name", "Title",
+//     "Experience", "Skills", "Technical Skills", "Education", "Projects", "Certifications",
+//     "Training", "Achievements", "Professional Background",
+
+//     // Common roles in tech and other domains
+//     "Developer", "Engineer", "Manager", "Consultant", "Analyst", "Administrator",
+//     "Specialist", "Coordinator", "Operator", "Support", "Executive", "HR", "Sales",
+//     "Marketing", "Finance", "Accounts", "Operations", "Testing", "Tester", "QA",
+//     "Quality Assurance", "Product Owner", "Product Manager", "Scrum Master", "Team Lead",
+
+//     // Specific tech roles and technologies
+//     "Java Developer", "Java Spring Boot Developer", "JavaScript Developer",
+//     "Frontend Developer", "Backend Developer", "Full Stack Developer", "Node.js Developer",
+//     "Python Developer", "Dotnet Developer", ".NET Developer", "Angular Developer",
+//     "React Developer", "Vue Developer", "PHP Developer", "SQL Developer", "Data Scientist",
+//     "Machine Learning Engineer", "AI Engineer", "Cloud Engineer", "DevOps Engineer",
+//     "Systems Administrator", "IT Support", "Software Engineer", "Software Developer",
+//     "Web Developer", "Mobile Developer", "iOS Developer", "Android Developer",
+//     "Technical Support", "Helpdesk", "Customer Support", "Customer Service",
+
+//     // Additional qualifiers
+//     "Immediate Joiner", "Looking for Opportunities", "Open to Work", "Available Immediately",
+//     "Notice Period", "Freelancer", "Intern", "Contractor", "Consultant",
+//     "Temporary", "Full-time", "Part-time", "Remote Worker", "Onsite", "Hybrid"
+//   ];
+
+
+//   const lines = text.split("\n");
+
+//   for (let i = 0; i < Math.min(5, lines.length); i++) {
+//     const line = lines[i].trim();
+//     if (line.length === 0) continue; // Skip empty lines
+
+//     // Skip lines containing any of the skip keywords
+//     if (skipsKeywords.some(keyword => line.toUpperCase().includes(keyword.toUpperCase()))) {
+//       continue;
+//     }
+
+//     // Split the line into words
+//     const words = line.split(/\s+/);
+
+//     // Check if the line contains 2 to 4 words where the first word starts with a capital letter
+//     if (
+//       words.length >= 2 &&
+//       words.length <= 4 &&
+//       /^[A-Z][a-z]+$/.test(words[0]) // First word starts with an uppercase letter
+//     ) {
+//       const potentialName = words.join(" ");
+
+//       if (validateName(potentialName)) {
+//         return potentialName;
+//       }
+//     }
+//   }
+
+//   return null;
+// }
+
+
+// function validateName(name) {
+//   // Common terms that should not be considered as names
+//   const invalidNameTerms = [
+//     "Soft Skills",
+//     "Technical Skills",
+//     "Education",
+//     "Work Experience",
+//     "Projects",
+//     "Tools",
+//     "Languages",
+//     "Achievements",
+//     "Developer Tools",
+//     "Gender",
+//   ];
+
+//   // Check if the extracted name matches any invalid terms
+//   return !invalidNameTerms.some((term) => name.includes(term));
+// }
+
+// Function for extracting name
+function extractNameFromResume(text) {
+  const nameFromKeyword = extractNameUsingKeywords(text);
+
+  if (nameFromKeyword !== "Not found") {
+    return nameFromKeyword;
+  }
+
+  const nameFromTopLines = extractNameFromTopLines(text);
+
+  if (nameFromTopLines) {
+    return nameFromTopLines;
+  }
+
+  return "Not found";
+}
+
 function extractNameUsingKeywords(text) {
   const nameKeywords = [
     "Name",
@@ -148,14 +415,26 @@ function extractNameUsingKeywords(text) {
   ];
 
   const lines = text.split("\n");
+  let previousWordsBuffer = []; // Buffer to store the last few words
 
   for (let line of lines) {
-    // Convert the line to lowercase for case-insensitive matching
-    const lowerLine = line.toLowerCase();
+    const trimmedLine = line.trim();
+
+    // Add the last 5 words of the current line to the buffer
+    const currentWords = trimmedLine.split(/\s+/).slice(-5); // Extract last 5 words
+    previousWordsBuffer.push(...currentWords);
+
+    // Limit the buffer size to 5 words
+    if (previousWordsBuffer.length > 5) {
+      previousWordsBuffer = previousWordsBuffer.slice(-5); // Keep only the last 5 words
+    }
 
     for (let keyword of nameKeywords) {
-      // Check if the line contains the keyword and does not contain any of the prevWords
-      if (line.includes(keyword) && !prevWords.some(prev => lowerLine.includes(prev))) {
+      // Check if the line contains the keyword and does not match with any `prevWords` in the buffer
+      if (
+        line.includes(keyword) &&
+        !previousWordsBuffer.some((prev) => line.includes(prev))
+      ) {
         const parts = line.split(":");
         if (parts.length > 1) {
           const name = parts[1].trim();
@@ -168,10 +447,9 @@ function extractNameUsingKeywords(text) {
   return "Not found";
 }
 
-
 function extractNameFromTopLines(text) {
   // List of keywords to skip when looking for names at the top
-  const skipsKeywords = [
+   const skipsKeywords = [
     "Resume", "Biodata", "CURRICULUM VITAE", "CV", "Profile", "Introduction",
     "Summary", "Professional Summary", "Objective", "Cover Letter", "Personal Information",
     "Candidate Profile", "Details", "Applicant Profile", "Application", "Applicant",
@@ -181,7 +459,7 @@ function extractNameFromTopLines(text) {
 
     // Common roles in tech and other domains
     "Developer", "Engineer", "Manager", "Consultant", "Analyst", "Administrator",
-    "Specialist", "Coordinator", "Operator", "Support", "Executive", "HR", "Sales",
+    "Specialist", "Coordinator", "Operator", "Support", "Executive", "Sales",
     "Marketing", "Finance", "Accounts", "Operations", "Testing", "Tester", "QA",
     "Quality Assurance", "Product Owner", "Product Manager", "Scrum Master", "Team Lead",
 
@@ -201,30 +479,23 @@ function extractNameFromTopLines(text) {
     "Temporary", "Full-time", "Part-time", "Remote Worker", "Onsite", "Hybrid"
   ];
 
-
   const lines = text.split("\n");
 
   for (let i = 0; i < Math.min(5, lines.length); i++) {
+    const line = lines[i].trim();
+    if (line.length === 0) continue; // Skip empty lines
+
     // Skip lines containing any of the skip keywords
-    if (skipsKeywords.some(keyword => lines[i].toUpperCase().includes(keyword.toUpperCase()))) {
+    if (skipsKeywords.some(keyword => line.includes(keyword))) {
       continue;
     }
 
-    // console.log( "lines: ",lines);
-    const words = lines[i].trim().split(/\s+/);
+    // Split the line into words
+    const words = line.split(/\s+/);
 
-    // Filter capitalized words
-    const capitalizedWords = words.filter((word) =>
-      /^[A-Z][a-zA-Z]+$/.test(word) || /^[A-Z]+$/.test(word)
-      // /^[A-Z][a-zA-Z]+$/.test(word)
-    );
-    // console.log("capitalizedWords: ",capitalizedWords, "Words: ",words)
-    if (
-      capitalizedWords.length === 2 ||
-      capitalizedWords.length === 3 ||
-      capitalizedWords.length === 4
-    ) {
-      const potentialName = capitalizedWords.join(" ");
+    // Check if the line contains 2 to 4 words
+    if (words.length >= 2 && words.length <= 4) {
+      const potentialName = words.join(" ");
 
       if (validateName(potentialName)) {
         return potentialName;
@@ -1187,7 +1458,7 @@ function extractJobTitle(text) {
 
 // }
 function extractExperience(text) {
-  console.log("text::", text)
+  // console.log("text::", text)
 
   const experienceKeywords = [
     "Experience", "Work Experience", "Professional Experience", "Work History", 
@@ -1558,21 +1829,22 @@ function extractLanguages(text) {
 
 
 function extractDetails(text) {
-  const name = extractNameFromResume(text);
-  const dob = extractDOB(text);
-  const phone = extractPhoneFromResume(text);
-  const email = extractEmailFromResume(text);
-  const gender = extractGenderFromResume(text);
-  // const gender = text.match(/Gender\s*:\s*(\w+)/)?.[1]?.trim() || "Not found";
-  const maritalStatus = extractMaritalStatus(text);
-  const technicalSkills = extractTechnicalSkills(text);
-  const education = extractEducation(text);
-  const jobTitle = extractJobTitle(text);
-  const experience = extractExperience(text);
-  const companyDetails = extractCompanyDetails(text);
-  const certifications = extractCertifications(text);
-  const languages = extractLanguages(text);
-  return { languages,  name, experience, jobTitle, dob, phone, gender, maritalStatus, email, education, technicalSkills, companyDetails, certifications, text };
+  const parsedText = text.trim();
+  const name = extractNameFromResume(parsedText);
+  const email = extractEmailFromResume(parsedText);
+  const jobTitle = extractJobTitle(parsedText);
+  const phone = extractPhoneFromResume(parsedText);
+  const dob = extractDOB(parsedText);
+  const gender = extractGenderFromResume(parsedText);
+  // const gender = parsedText.match(/Gender\s*:\s*(\w+)/)?.[1]?.trim() || "Not found";
+  const maritalStatus = extractMaritalStatus(parsedText);
+  const education = extractEducation(parsedText);
+  const experience = extractExperience(parsedText);
+  const technicalSkills = extractTechnicalSkills(parsedText);
+  const companyDetails = extractCompanyDetails(parsedText);
+  const certifications = extractCertifications(parsedText);
+  const languages = extractLanguages(parsedText);
+  return { name, email, jobTitle, phone, dob, gender, maritalStatus, education, experience, technicalSkills, companyDetails, certifications, languages, text:parsedText };
 }
 
 app.post("/api/upload", upload.single("resume"), async (req, res) => {
