@@ -301,24 +301,26 @@ const precedeArrayKeywords = [
   "technological", "expert", "knowledge", "competencies"
 ];
 
-// Email Function array
+// Education Function array
+const educationKeywords = ["Education", "Academic Background", "Degrees", "Qualifications"];
 
 
-
-// Email Function array
-
-
-
-// Email Function array
-
-
-
-// Email Function array
+// Experience Function array
+const experienceKeywords = [
+  "Experience", "Work Experience", "Professional Experience", "Work History",
+  "Employment History", "Career Summary", "Relevant Experience", "Previous Experience",
+  "Professional Background", "Job History", "Project Experience", "Employment Experience",
+  "Professional History", "Career Highlights", "Experience Summary", "Work Background",
+  "Professional Summary", "Roles and Responsibilities", "Positions Held", "Past Positions"
+];
 
 
+// Cetification Function array // Define certification keywords
+const certificationKeywords = ["Certification", "Certifications", "Courses", "CERTIFICATE"];
 
 
-
+// Extra  array currently not used
+const personalDetailsKeywords = ["Personal Information", "Personal Details", "Personal Profile", "Personal Details"];
 
 
 
@@ -552,11 +554,11 @@ function extractMaritalStatus(text) {
 }
 // Function for extracting Education details
 function extractEducation(text) {
-  const keywords = ["Education", "Academic Background", "Degrees", "Qualifications"];
+  const educationKeywords = ["Education", "Academic Background", "Degrees", "Qualifications"];
   const ignorableWords = ["Experience", "Work Experience", "Skills", "Projects", "PROFESSIONAL SUMMARY", "Certification", "Certifications"];
 
   // Create regex patterns from keywords and ignorable words
-  const keywordsPattern = keywords.join("|");
+  const keywordsPattern = educationKeywords.join("|");
   const ignorableWordsPattern = ignorableWords.join("|");
 
   // Regex to extract the Education section (exclude the keyword from the output)
@@ -742,32 +744,62 @@ function extractCompanyDetails(text) {
   return companyMatch ? companyMatch[1].trim() : "Not found";
 }
 
+// //Function for Certifications Extraction ------------
+// function extractCertifications(text) {
+//   console.log("text:::",text)
+//   const certificationKeywords = ["Certification", "Certifications", "Courses", "CERTIFICATE"];
+//   const ignorableWords = ["Education", "Skills", "Projects", "Work Experience", "Experience"];
+
+//   const certificationKeywordsPattern = certificationKeywords.join("|");
+//   const ignorableWordsPattern = ignorableWords.join("|");
+
+//   // Regex to extract the Certifications section
+//   const certificationRegex = new RegExp(
+//     `(?:${certificationKeywordsPattern})[\\s\\S]*?(?=\\n(?:${ignorableWordsPattern}|$))`,
+//     "i"
+//   );
+
+//   const certificationMatch = text.match(certificationRegex);
+
+//   if (certificationMatch) {
+//     // Use the full matched string (certificationMatch[0]) and remove the header
+//     const certifications = certificationMatch[0]
+//       .replace(new RegExp(`^(${certificationKeywordsPattern})`, "i"), "") // Remove the header
+//       .split(/,\s*/) // Split by commas
+//       .map((cert) => cert.trim()); // Trim each certification
+
+//     return certifications.length ? certifications : ["Not found"];
+//   }
+
+//   return ["Not found"];
+// }
+
 //Function for Certifications Extraction ------------
 function extractCertifications(text) {
-  const certificationKeywords = ["Certification", "Certifications", "Courses"];
-  const ignorableWords = ["Education", "Skills", "Projects", "Work Experience", "Experience"];
 
-  const certificationKeywordsPattern = certificationKeywords.join("|");
-  const ignorableWordsPattern = ignorableWords.join("|");
+  // Normalize text to improve matching
+  const normalizedText = text.replace(/\s+/g, ' ').trim();
 
-  // Regex to extract the Certifications section
+  // Build a regex to match sections starting with certification keywords
   const certificationRegex = new RegExp(
-    `(?:${certificationKeywordsPattern})[\\s\\S]*?(?=\\n(?:${ignorableWordsPattern}|$))`,
-    "i"
+    `(?:${certificationKeywords.join('|')}):?\\s*([\\s\\S]+?)(?:\\n\\s*\\n|(?:Education|Skills|Achievements|Personal|Areas of Training|Summary)[^\\n]*)`,
+    'i'
   );
 
-  const certificationMatch = text.match(certificationRegex);
+  const match = normalizedText.match(certificationRegex);
 
-  if (certificationMatch) {
-    // Use the full matched string (certificationMatch[0]) and remove the header
-    const certifications = certificationMatch[0]
-      .replace(new RegExp(`^(${certificationKeywordsPattern})`, "i"), "") // Remove the header
-      .split(/,\s*/) // Split by commas
-      .map((cert) => cert.trim()); // Trim each certification
+  if (match && match[1]) {
+    // Extract the certifications text
+    const certificationsText = match[1].trim();
 
-    return certifications.length ? certifications : ["Not found"];
+    // Split the certifications text into lines
+    const certificationsArray = certificationsText
+      .split(/\n|[-]/) // Split by newlines or bullets
+      .map(line => line.trim()) // Trim each line
+      .filter(line => line.length > 0); // Filter out empty lines
+
+    return certificationsArray;
   }
-
   return ["Not found"];
 }
 
