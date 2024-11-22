@@ -417,7 +417,7 @@ function validateName(name) {
 function extractDOB(text) {
 
   // Create a keyword regex pattern
-  const keywordPattern = dobKeaywords.join("|");
+  const keywordPattern = dobKeywords.join("|");
 
   // Define month names mapping (both full and abbreviated)
   const monthMapping = {
