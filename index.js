@@ -1644,6 +1644,7 @@ function extractCertifications(text) {
 
 
 function extractLanguages(text) {
+  console.log("function 1 is being used")
   const languagesArray = [
     "Hindi", "English", "Bengali", "Marathi", "Telugu", "Tamil", "Gujarati",
     "Urdu", "Kannada", "Odia", "Malayalam", "Punjabi", "Assamese", "Maithili",
@@ -1753,6 +1754,7 @@ function extractLanguages(text) {
 
 // for bullet point logic 2nd
 function extractLanguages(text) {
+  console.log("function 2 is being used")
   const languagesArray = [
     "Hindi", "English", "Bengali", "Marathi", "Telugu", "Tamil", "Gujarati",
     "Urdu", "Kannada", "Odia", "Malayalam", "Punjabi", "Assamese", "Maithili",
