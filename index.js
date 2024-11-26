@@ -542,6 +542,8 @@ function extractPhoneFromResume(text) {
   return phone;
 }
 
+
+
 // Function for extracting Marital Status
 function extractMaritalStatus(text) {
 
@@ -552,34 +554,351 @@ function extractMaritalStatus(text) {
   const statusMatch = text.match(statusRegex);
   return statusMatch ? statusMatch[1].trim() : "Not found";
 }
+
+// // Function for extracting Education details
+// function extractEducation(text) {
+//   const educationKeywords = ["Education", "Academic Background", "Degrees", "Qualifications"];
+//   const ignorableWords = ["Experience", "Work Experience", "Skills", "Projects", "PROFESSIONAL SUMMARY", "Certification", "Certifications"];
+
+//   // Create regex patterns from keywords and ignorable words
+//   const keywordsPattern = educationKeywords.join("|");
+//   const ignorableWordsPattern = ignorableWords.join("|");
+
+//   // Regex to extract the Education section (exclude the keyword from the output)
+//   const educationRegex = new RegExp(
+//     `(?:${keywordsPattern})[\\s\\S]*?(?=\\n(?:${ignorableWordsPattern}|$))`,
+//     "i"
+//   );
+
+//   const match = text.match(educationRegex);
+
+//   if (match) {
+//     let educationDetails = match[0].trim(); // Extract the full match
+//     // Remove the keyword explicitly
+//     educationDetails = educationDetails.replace(new RegExp(`^(${keywordsPattern})`, "i"), "").trim();
+//     educationDetails = educationDetails.replace(/\s{2,}/g, " "); // Normalize excessive whitespace
+//     educationDetails = educationDetails.replace(/;+/g, ";"); // Normalize semicolons
+//     return educationDetails;
+//   }
+
+//   return "No detailed education information found";
+// }
+
 // Function for extracting Education details
+// function extractEducation(text) {
+//   console.log("text::",text);
+//   const educationKeywords = ["Education", "EDUCATION", "Academic Background", "Degrees", "Qualifications"];
+//   const ignorableWords = ["Experience", "Work Experience", "Skills", "Projects", "PROFESSIONAL SUMMARY", "Certification", "Certifications"];
+
+//   // Create regex patterns from keywords and ignorable words
+//   const keywordsPattern = educationKeywords.join("|");
+//   const ignorableWordsPattern = ignorableWords.join("|");
+
+//   // Regex to extract the Education section (exclude the keyword from the output)
+//   const educationRegex = new RegExp(
+//     `(?:${keywordsPattern})[\\s\\S]*?(?=\\n(?:${ignorableWordsPattern}|$))`,
+//     "i"
+//   );
+
+//   const match = text.match(educationRegex);
+//   console.log("match::::",match);
+//   if (match) {
+//     let educationDetails = match[0].trim(); // Extract the full match
+//     // Remove the keyword explicitly
+//     educationDetails = educationDetails.replace(new RegExp(`^(${keywordsPattern})`, "i"), "").trim();
+//     educationDetails = educationDetails.replace(/\s{2,}/g, " "); // Normalize excessive whitespace
+//     educationDetails = educationDetails.replace(/;+/g, ";"); // Normalize semicolons
+//     return educationDetails;
+//   }
+
+//   return "No detailed education information found";
+// }
+
+
+// Function for extracting Education details
+function fetchEducationFromParagraph(educationTrimmedText){
+   
+  
+  // const regexDegree = /(the\s+)?([A-Za-z0-9\s\.,-\\+\\(\\)]+(?:)[A-Za-z\s\-\,\.\[\]\(\)\%]*)(from)/i;
+    const regexDegree = /(the\s+)?(.*?)(?=from)/i;
+   
+   
+   const regexCollege = /(?<=from\s)(.*?)((?=\d{4})|((\s*\w{5,})\s*[)]?\s*(?=[.!?]))|((\s*\w{5,})\s*[)]?\s*(?=[,]))|(?=($))|(?=[\n])|(?=\s*with))/i; 
+  // const regexCollege = /(?<=from\s)(.*?)(\s*[(]?\s*((\s*(?=\d{4}))|((\s*\w{5,})\s*[)]?\s*(?=[.!?]))|((\s*\w{5,})\s*[)]?\s*(?=[,])))|(?=($)))/i; 
+    
+ 
+  const regexYear = /((\s*\d{4}\s*[-]?\s*\d{4}\s*)|(\s*[(]?\s*\d{4}\s*[-]?\s*\d{4}\s*[)]?\s*)|(\s*\d{4}\s*))(?=\s*|[\n.!?,])/i;
+     
+  
+   const regexMark =/((?<![+\(\[])((100)|(\d{1,2}))(?![+\)\]]))([.][0-9]{1,})?\s*[%](?=\s*|[\n.!?,])/i;
+ 
+   let Degree="";
+   let College="";
+   let Year="";
+   let Mark="";
+   let Index=-1,IndexD=0,IndexC=0,IndexY=0,IndexM=0,IndexA=[];
+   let details=[];
+   let words=[];
+   var IgnoreWordDegree=["i","am",,"have","had","doing","did","done","does","completed","complete","completes","currently"
+ ,"passed","pass","passes" ]
+   var   IgnoreWordCollege=["in","on","year","with"];
+  let num=0;
+  var _item="";
+   while(educationTrimmedText.length>0)
+   {
+   num=num+1;
+    Degree="";College="";Year="";Mark="";
+    // console.log(num);  console.log(educationTrimmedText);
+    const matchDegree = educationTrimmedText.match(regexDegree);
+   if (matchDegree) {
+   // Capture the group containing the university name
+       words = matchDegree[0].trim().split(' ');
+       if (matchDegree.index+matchDegree[0].length>=Index)
+       {Index=matchDegree.index+matchDegree[0].length;}
+       IndexD=matchDegree.index+matchDegree[0].length;
+          //  console.log('Degree '+Index);
+     Degree=  words.map(function(item,index,array){
+        
+      
+        _item=item.trim().toLowerCase();
+         if(!IgnoreWordDegree.includes(_item)  &&index<words.length){
+          if(((Number.isNaN(Number(_item)) && !_item.includes('%')) 
+     || (_item==="10") || (_item==="12")))
+          {
+        
+              return item;
+              
+          
+          }
+             
+         }
+       
+         });
+     
+   Degree=Degree.filter(item => item !== undefined).join(" ");
+  
+   }
+  
+     const matchCollege = educationTrimmedText.match(regexCollege);
+   //console.log(matchCollege);
+   if (matchCollege) {
+  // Capture the group containing the university name
+    if (matchCollege.index+matchCollege[0].length>=Index)
+       {Index=matchCollege.index+matchCollege[0].length;}
+       IndexC=matchCollege.index+matchCollege[0].length;
+       // console.log('College '+Index);
+       words = matchCollege[0].trim().split(' ');
+     College=  words.map(function(item,index,array){
+       
+      _item=item.trim().toLowerCase().replace("(","").replace(")","").replace("-","").replace(":","").replace("%","");
+        if(!IgnoreWordCollege.includes(_item.trim().toLowerCase())  &&index<words.length)
+          {
+               if(Number.isNaN(Number(_item)) && !_item.includes('%')  )
+          {
+           
+              return item;
+          }
+              
+          
+          }
+       
+         });
+     
+   College=College.filter(item => item !== undefined).join(" ");
+  
+   
+  
+  
+  
+  
+   } 
+     const matchYear = educationTrimmedText.match(regexYear);
+  // console.log('Year1 '+matchYear);
+   if (matchYear) {
+    // Capture the group containing the university name
+  
+  const delimiters = ["(",")", "-","\\s"];
+  const regex = new RegExp(`[${delimiters.join('')}]`);
+  
+     words = matchYear[0].trim().split(regex);
+  
+      words = words.filter(item => item!=='');
+   //console.log('Year0 '+matchYear.index +' - ' +Index);
+       if (matchYear.index+matchYear[0].length>=Index)
+       {Index=matchYear.index+matchYear[0].length;
+            //  console.log('Year1 '+Index);
+       }
+       IndexY=matchYear.index+matchYear[0].length;
+     //  console.log('Year '+Index);
+     Year=  words.map(function(item,index,array){
+     
+      if ((!isNaN(Number(item))))
+          {
+         
+              return item;
+              
+          
+          }
+       
+         });
+     
+     if(Year.length>1)
+    { 
+        Year=Year[Year.length-1];
+     
+    }else{ Year=Year[0];}
+   
+   }   
+   const matchMark = educationTrimmedText.match(regexMark);
+   
+   if (matchMark) { 
+     Mark= matchMark[0].trim();  // Capture the group containing the university name
+       
+     if (matchMark.index+matchMark[0].length>=Index)
+       {Index=matchMark.index+matchMark[0].length;}
+       IndexM=matchMark.index+matchMark[0].length;
+        //  console.log('Mark '+Index);
+   } 
+   if ( Degree!=''|| College!=''|| Year!=''|| Mark!=''){
+       
+        if (IndexY>IndexC && IndexY-IndexC>30)
+    {   
+            if (IndexM>=IndexY )
+        {  
+            Mark="";
+            Year="";
+             Index=IndexC;
+            
+        }
+             if (IndexM>IndexC && IndexY>IndexM )
+        {
+               Year="";
+              Index=IndexM;
+              if(IndexM-IndexC>25)
+              {  
+                  Index=IndexC;
+                   Mark="";
+              }
+         }  
+     
+   }
+      if (IndexM>IndexC && IndexM-IndexC>25)
+    { 
+             
+              if (IndexY>=IndexM )
+          { 
+              Mark="";
+              Year="";
+             Index=IndexC;
+           }
+            if (IndexY>IndexC && IndexY<IndexM )
+        {   
+              Mark="";
+              Index=IndexY;
+            if  (IndexY-IndexC>30){
+                  Year="";
+              Index=IndexC;
+            }
+            
+         }  
+      
+    }
+    
+     
+ let detail={};
+   detail.degree=Degree;
+    detail.college=College;
+     detail.year=Year;
+     detail.mark=Mark;
+     details.push(detail);
+    
+  
+   }
+  
+   
+    
+   if(Index>0)
+   { // console.log(' num '+num +' index '+Index);
+       educationTrimmedText=educationTrimmedText.substring(Index, educationTrimmedText.length)
+       Index=-1,IndexD=0,IndexC=0,IndexY=0,IndexM=0; 
+    
+      
+   }
+   if ( Degree==''&& College==''&& Year==''&& Mark==''){educationTrimmedText="";}
+   
+   }
+  
+   return details;
+   
+ };
+  
 function extractEducation(text) {
-  const educationKeywords = ["Education", "Academic Background", "Degrees", "Qualifications"];
-  const ignorableWords = ["Experience", "Work Experience", "Skills", "Projects", "PROFESSIONAL SUMMARY", "Certification", "Certifications"];
-
-  // Create regex patterns from keywords and ignorable words
-  const keywordsPattern = educationKeywords.join("|");
-  const ignorableWordsPattern = ignorableWords.join("|");
-
-  // Regex to extract the Education section (exclude the keyword from the output)
-  const educationRegex = new RegExp(
-    `(?:${keywordsPattern})[\\s\\S]*?(?=\\n(?:${ignorableWordsPattern}|$))`,
-    "i"
-  );
-
-  const match = text.match(educationRegex);
-
-  if (match) {
-    let educationDetails = match[0].trim(); // Extract the full match
-    // Remove the keyword explicitly
-    educationDetails = educationDetails.replace(new RegExp(`^(${keywordsPattern})`, "i"), "").trim();
-    educationDetails = educationDetails.replace(/\s{2,}/g, " "); // Normalize excessive whitespace
-    educationDetails = educationDetails.replace(/;+/g, ";"); // Normalize semicolons
-    return educationDetails;
-  }
-
-  return "No detailed education information found";
-}
+     const educationKeywords = [
+         "Education",
+         "Academic Background",
+         "Academia",
+         "Academic Background",
+         "Scholastic Profile",
+         "Academic Qualification",
+         "Degrees",
+         "Qualifications",
+         "Academic Profile",
+         "Education Qualification",
+         "Educational Profile",
+     ];
+     const ignorableWordsForEducation = [
+         "Learning New Technologies",
+         "HOBBIES",
+         "Extra Activities",
+         "Work Experience",
+         "Technical Expertise",
+         "Additional Information",
+         "Skills",
+         "Projects",
+         "PROFESSIONAL SUMMARY",
+         "PROFESSIONAL EXPERIENCE",
+         "PERSONAL DETAILS",
+         "Certification",
+         "Certifications",
+         "Areas of Training"
+     ];
+ 
+     // Split the parsed text into lines
+     const lines = text.split('\n');
+     
+     // Flag to track if we are inside the education section
+     let inEducationSection = false;
+     let educationSection = [];
+ 
+     for (let line of lines) {
+         const trimmedLine = line.trim();
+ 
+         // Check if the line starts an education section
+         if (!inEducationSection && educationKeywords.some(keyword => trimmedLine.toLowerCase().includes(keyword.toLowerCase()))) {
+             inEducationSection = true;
+             continue; // Skip the line containing the keyword
+         }
+ 
+         // Check if the line starts an ignorable section
+         if (inEducationSection && ignorableWordsForEducation.some(keyword => trimmedLine.toLowerCase().includes(keyword.toLowerCase()))) {
+             break; // Exit the education section
+         }
+ 
+         // Add the line to the education section if inside it
+         if (inEducationSection) {
+             const cleanedline = trimmedLine.replace(/\uF076/g, "").trim();
+             educationSection.push(cleanedline);
+         }
+     }
+     if(educationSection.length>0){
+         // Join and return the education section as a single string
+         const educationTrimmedText = educationSection.join('\n').trim();
+         console.log("educationTrimmedText:::::\n",educationTrimmedText);
+         const finalEducation = fetchEducationFromParagraph(educationTrimmedText);
+         return finalEducation;
+     }
+     return "No detailed education information found";
+ }
 
 // helper Function for extractTechnicalSkills
 function escapeRegExp(string) {
@@ -746,7 +1065,6 @@ function extractCompanyDetails(text) {
 
 // //Function for Certifications Extraction ------------
 // function extractCertifications(text) {
-//   console.log("text:::",text)
 //   const certificationKeywords = ["Certification", "Certifications", "Courses", "CERTIFICATE"];
 //   const ignorableWords = ["Education", "Skills", "Projects", "Work Experience", "Experience"];
 
