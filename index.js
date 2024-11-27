@@ -876,8 +876,9 @@ function extractEducation(text) {
 
     // Add the line to the education section if inside it
     if (inEducationSection) {
-      const cleanedline = trimmedLine.replace(/\uF076/g, "").trim();
-      educationSection.push(cleanedline);
+      educationSection.push(trimmedLine);
+      // const cleanedline = trimmedLine.replace(/[]/g, "").trim();
+      // educationSection.push(cleanedline);
     }
   }
   if (educationSection.length > 0) {
@@ -1232,7 +1233,9 @@ function extractLanguages(text) {
 }
 
 function extractDetails(text) {
-  const parsedText = text.trim();
+  // const parsedText = text.trim();
+  const parsedText = text.replace(/[]/g, "").trim();
+  
   const name = extractNameFromResume(parsedText);
   const email = extractEmailFromResume(parsedText);
   const jobTitle = extractJobTitle(parsedText);
