@@ -334,6 +334,7 @@ const ignorableWordsForEducation = [
   "Areas of Training"
 ];
 
+
 // Experience Function array
 const experienceKeywords = [
   "Experience", "Work Experience", "Professional Experience", "Work History",
@@ -1102,7 +1103,7 @@ function extractCertifications(text) {
 
   // Build a regex to match sections starting with certification keywords
   const certificationRegex = new RegExp(
-    `(?:${certificationKeywords.join('|')}):?\\s*([\\s\\S]+?)(?:\\n\\s*\\n|(?:Education|Skills|Achievements|Personal|Areas of Training|Summary)[^\\n]*)`,
+    `(?:${certificationKeywords.join('|')}):?\\s*([\\s\\S]+?)(?:\\n\\s*\\n|(?:Education|HOBBIES|Projects|Work Experience|Technical Expertise|PROFESSIONAL SUMMARY|PROFESSIONAL EXPERIENCE|PERSONAL DETAILS|Skills|Achievements|Personal|Areas of Training|Summary)[^\\n]*)`,
     'i'
   );
 
