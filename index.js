@@ -302,8 +302,37 @@ const precedeArrayKeywords = [
 ];
 
 // Education Function array
-const educationKeywords = ["Education", "Academic Background", "Degrees", "Qualifications"];
+const educationKeywords = [
+  "Education",
+  "Academic Background",
+  "Academia",
+  "Academic Background",
+  "Scholastic Profile",
+  "Academic Qualification",
+  "Degrees",
+  "Qualifications",
+  "Academic Profile",
+  "Education Qualification",
+  "Educational Profile",
+];
 
+// Education Function array
+const ignorableWordsForEducation = [
+  "Learning New Technologies",
+  "HOBBIES",
+  "Extra Activities",
+  "Work Experience",
+  "Technical Expertise",
+  "Additional Information",
+  "Skills",
+  "Projects",
+  "PROFESSIONAL SUMMARY",
+  "PROFESSIONAL EXPERIENCE",
+  "PERSONAL DETAILS",
+  "Certification",
+  "Certifications",
+  "Areas of Training"
+];
 
 // Experience Function array
 const experienceKeywords = [
@@ -832,36 +861,8 @@ function fetchEducationFromParagraph(educationTrimmedText){
    
  };
   
+ let educationTrimmedText = "";
 function extractEducation(text) {
-     const educationKeywords = [
-         "Education",
-         "Academic Background",
-         "Academia",
-         "Academic Background",
-         "Scholastic Profile",
-         "Academic Qualification",
-         "Degrees",
-         "Qualifications",
-         "Academic Profile",
-         "Education Qualification",
-         "Educational Profile",
-     ];
-     const ignorableWordsForEducation = [
-         "Learning New Technologies",
-         "HOBBIES",
-         "Extra Activities",
-         "Work Experience",
-         "Technical Expertise",
-         "Additional Information",
-         "Skills",
-         "Projects",
-         "PROFESSIONAL SUMMARY",
-         "PROFESSIONAL EXPERIENCE",
-         "PERSONAL DETAILS",
-         "Certification",
-         "Certifications",
-         "Areas of Training"
-     ];
  
      // Split the parsed text into lines
      const lines = text.split('\n');
@@ -892,7 +893,8 @@ function extractEducation(text) {
      }
      if(educationSection.length>0){
          // Join and return the education section as a single string
-         const educationTrimmedText = educationSection.join('\n').trim();
+         
+         educationTrimmedText = educationSection.join('\n').trim();
          console.log("educationTrimmedText:::::\n",educationTrimmedText);
          const finalEducation = fetchEducationFromParagraph(educationTrimmedText);
          return finalEducation;
@@ -1256,7 +1258,7 @@ function extractDetails(text) {
   const companyDetails = extractCompanyDetails(parsedText);
   const certifications = extractCertifications(parsedText);
   const languages = extractLanguages(parsedText);
-  return { name, email, jobTitle, phone, dob, gender, maritalStatus, education, experience, technicalSkills, companyDetails, certifications, languages, text: parsedText };
+  return { name, email, jobTitle, phone, dob, gender, maritalStatus, education, experience, technicalSkills, companyDetails, certifications, languages, text: parsedText, educationTrimmedText };
 }
 
 app.post("/api/upload", upload.single("resume"), async (req, res) => {
