@@ -1085,15 +1085,47 @@ function extractCompanyDetails(text) {
 // }
 
 //Function for Certifications Extraction ------------
-function extractCertifications(text) {
+// function extractCertifications(text) {
 
-  // Normalize text to improve matching
-  const normalizedText = text.replace(/\s+/g, ' ').trim();
+//   // Normalize text to improve matching
+//   const normalizedText = text.replace(/\s+/g, ' ').trim();
+
+//   // Build a regex to match sections starting with certification keywords
+//   const certificationRegex = new RegExp(
+//     `(?:${certificationKeywords.join('|')}):?\\s*([\\s\\S]+?)(?:\\n\\s*\\n|(?:Education|HOBBIES|Projects|Work Experience|Technical Expertise|PROFESSIONAL SUMMARY|PROFESSIONAL EXPERIENCE|PERSONAL DETAILS|Skills|Achievements|Personal|Areas of Training|Summary)[^\\n]*)`,
+//     'i'
+//   );
+
+//   const match = normalizedText.match(certificationRegex);
+
+//   if (match && match[1]) {
+//     // Extract the certifications text
+//     const certificationsText = match[1].trim();
+
+//     // Split the certifications text into lines
+//     const certificationsArray = certificationsText
+//       .split(/\n|[-]/) // Split by newlines or bullets
+//       .map(line => line.trim()) // Trim each line
+//       .filter(line => line.length > 0); // Filter out empty lines
+
+//     return certificationsArray;
+//   }
+//   return ["Not found"];
+// }
+
+function extractCertifications(text) {
+  // Normalize text to unify spaces and handle irregular breaks
+  const normalizedText = text.replace(/\s+/g, " ").trim();
+
+  // Define certification keywords
+  const certificationKeywords = ["Certification", "Certifications", "Cert."];
 
   // Build a regex to match sections starting with certification keywords
   const certificationRegex = new RegExp(
-    `(?:${certificationKeywords.join('|')}):?\\s*([\\s\\S]+?)(?:\\n\\s*\\n|(?:Education|HOBBIES|Projects|Work Experience|Technical Expertise|PROFESSIONAL SUMMARY|PROFESSIONAL EXPERIENCE|PERSONAL DETAILS|Skills|Achievements|Personal|Areas of Training|Summary)[^\\n]*)`,
-    'i'
+    `(?:${certificationKeywords.join(
+      "|"
+    )}):?\\s*([\\s\\S]+?)(?:\\n\\s*\\n|(?:Education|Skills|Achievements|Personal|Areas of Training|Summary)[^\\n]*)`,
+    "i"
   );
 
   const match = normalizedText.match(certificationRegex);
@@ -1102,14 +1134,15 @@ function extractCertifications(text) {
     // Extract the certifications text
     const certificationsText = match[1].trim();
 
-    // Split the certifications text into lines
+    // Split into lines or items, ensuring logical breaks are respected
     const certificationsArray = certificationsText
-      .split(/\n|[-]/) // Split by newlines or bullets
-      .map(line => line.trim()) // Trim each line
-      .filter(line => line.length > 0); // Filter out empty lines
+      .split(/\n|[]/) // Split on newlines or bullet characters
+      .map((line) => line.trim()) // Trim each line
+      .filter((line) => line.length > 0); // Filter out empty lines
 
     return certificationsArray;
   }
+
   return ["Not found"];
 }
 
