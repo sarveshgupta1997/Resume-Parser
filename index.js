@@ -3086,6 +3086,7 @@ function extractDetails(text) {
 }
 
 app.post("/api/upload", upload.single("resume"), async (req, res) => {
+  educationTrimmedText = "";
   const file = req.file;
 
   if (!file) {
