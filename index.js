@@ -853,23 +853,25 @@ function extractMaritalStatus(text) {
 
   // starts year
 // starts year
-function get_Year(educationTrimmedText,MaxNotFromIndex)
-{
- 
-const regexYear = /((\s*\d{4}\s*[-–]?\s*\d{4}\s*)|(\s*[(]?\s*\d{4}\s*[-–]?\s*\d{4}\s*[)]?\s*)|(\s*\d{2,}\s*[-–]\s*\d{2,}\s*)|(\s*[(]?\s*\d{2,}\s*[-–]\s*\d{2,}\s*[)]?\s*)|(\s*\d{4}\s*))(?=\s*|[\n.!?,])/i;
-const matchYear = educationTrimmedText.substring(0,MaxNotFromIndex).match(regexYear);
- var year="",sentence=educationTrimmedText;
- 
- if (matchYear) {
-  
-const delimiters = ["(",")","–", "-","\\s"];
-const regex = new RegExp(`[${delimiters.join('')}]`);
-words = matchYear[0].trim().split(/[\(\)\\s\-\–]/);
 
-    words = words.filter(item => item!=='');
+  // starts year
+  function get_Year(educationTrimmedText,MaxNotFromIndex)
+  {
    
+  const regexYear = /((\s*\d{4}\s*[-–]?\s*\d{4}\s*)|(\s*[(]?\s*\d{4}\s*[-–]?\s*\d{4}\s*[)]?\s*)|(\s*\d{2,}\s*[-–]\s*\d{2,}\s*)|(\s*[(]?\s*\d{2,}\s*[-–]\s*\d{2,}\s*[)]?\s*)|([A-Za-z]{3,}\s*['`]?\d{2}\s*[-]?\s* [A-Za-z]{3,}\s*['`]?\d{2})|(\s*\d{4}\s*))(?=\s*|[\n.!?,])/i;
+  const matchYear = educationTrimmedText.substring(0,MaxNotFromIndex).match(regexYear);
+   var year="",sentence=educationTrimmedText;
    
-     const replacement="#".repeat(matchYear[0].length);;
+   if (matchYear) {
+    
+  const delimiters = ["(",")","–", "-","\\s"];
+  const regex = new RegExp(`[${delimiters.join('')}]`);
+  words = matchYear[0].trim().split(/[\(\)\s\-\–\'\`]/);
+
+      words = words.filter(item => item!=='');
+     
+     
+       const replacement="#".repeat(matchYear[0].length);;
 const startIdx=matchYear.index;
 const endIdx=matchYear.index+matchYear[0].length;
 // Extract the substring that is in the specified range
@@ -877,488 +879,493 @@ const before = educationTrimmedText.slice(0, startIdx);
 const middle =replacement;
 const after = educationTrimmedText.slice(endIdx);
 sentence=before + middle + after;
-  const Year=  words.filter(item => item !== '').map(function(item,index,array){
-   
-    if ((!isNaN(Number(item))))
-        {
+    const Year=  words.filter(item => item !== '').map(function(item,index,array){
+     
+      if ((!isNaN(Number(item))))
+          {
+         
+              return item;
+              
+          
+          }
        
-            return item;
-            
-        
-        }
+         });
      
-       });
-   
-   if(Year.length>1)
-  { 
-    year=Year[Year.length-1];
-   
-  }else{ year=Year[0];}
+     if(Year.length>1)
+    { 
+      year=Year[Year.length-1];
+     
+    }else{ year=Year[0];}
+    
+   }   return {"educationTrimmedText":sentence,"year":year};
+  }
+  // ends year
+ // starts mark
+  function get_Mark(educationTrimmedText,MaxNotFromIndex){
   
- }   return {"educationTrimmedText":sentence,"year":year};
-}
-// ends year
-// starts mark
-function get_Mark(educationTrimmedText,MaxNotFromIndex){
-
-var regexMark =/\b((100)|[4-9]|[1-9][0-9])([.][0-9]{1,})?\s*[%]?\b/i;
- var matchMark = educationTrimmedText.substring(0,MaxNotFromIndex).match(regexMark);
- var mark="",sentence=educationTrimmedText;
- if (matchMark) { 
-   Mark= matchMark[0].trim();  // Capture the group containing the university name
-     
-      const replacement="@".repeat(matchMark[0].length);
-      const startIdx=matchMark.index;
-      const endIdx=matchMark.index+matchMark[0].length;
-      // Extract the substring that is in the specified range
-      const before = educationTrimmedText.slice(0, startIdx);
-      const middle =replacement;
-      const after = educationTrimmedText.slice(endIdx);
-      sentence=before + middle + after;
-      mark= Mark;
- }   return {"educationTrimmedText":sentence,"mark":mark};
- }      
- // end mark
+  var regexMark =/\b((100)|[4-9]|[1-9][0-9])([.][0-9]{1,})?\s*[%]?\b/i;
+   var matchMark = educationTrimmedText.substring(0,MaxNotFromIndex).match(regexMark);
+   var mark="",sentence=educationTrimmedText;
+   if (matchMark) { 
+     Mark= matchMark[0].trim();  // Capture the group containing the university name
+       
+        const replacement="@".repeat(matchMark[0].length);
+        const startIdx=matchMark.index;
+        const endIdx=matchMark.index+matchMark[0].length;
+        // Extract the substring that is in the specified range
+        const before = educationTrimmedText.slice(0, startIdx);
+        const middle =replacement;
+        const after = educationTrimmedText.slice(endIdx);
+        sentence=before + middle + after;
+        mark= Mark;
+   }   return {"educationTrimmedText":sentence,"mark":mark};
+   }      
+   // end mark
 
 function maskDegree(educationTrimmedText,index,item){
- 
-const replacement="*".repeat(item.length);
-      const startIdx=index-item.length;
-      const endIdx=startIdx+item.length;
-      // Extract the substring that is in the specified range
-      const before = educationTrimmedText.slice(0, startIdx);
-      const middle =replacement;// 
-      const after = educationTrimmedText.slice(endIdx)
-     
-      return before + middle + after;
-
+   
+  const replacement="*".repeat(item.length);
+        const startIdx=index-item.length;
+        const endIdx=startIdx+item.length;
+        // Extract the substring that is in the specified range
+        const before = educationTrimmedText.slice(0, startIdx);
+        const middle =replacement;// 
+        const after = educationTrimmedText.slice(endIdx)
+       
+        return before + middle + after;
+  
 }
 
 function fetchEducationFromParagraph(educationTrimmedText){
-   const regexDegreeIfNotFromEndLine         =  /(the\s+)?(.*?)($)/i; 
- const regexCollegeName=  /^[a-zA-Z0-9.,\-\)\(&\]\[\]]{1,}$/i;
+   	const regexDegreeIfNotFromEndLine         =  /(the\s+)?(.*?)($)/i; 
+   const regexCollegeName=  /^[a-zA-Z0-9.,\-\)\(&\]\[\]]{1,}$/i;
+  
+  let num1=1;var getYear="";var getMark="";var IndexForYearMark=0;
+   let Degree="";
+   let College="";
+   let Year="";
+   let Mark="";
+   let Index=-1;
+   let details=[],CheckDuplicate=[];
+   let words=[];
+   var IgnoreWordDegree=["i","am","do","have","had","doing","did","done","does","completed","complete","completes","currently","out" ,"passed","No","Attempts","Attempt","mark","marks","pass","passes","Passing","Month","&","Remarks","Remark","(",")","-",":","–" ,"SNO","Class","Sem","Semester","Semesters","Year","Percentage","%",
+   "position","division","distinction","first","second","third","1st","2nd","3rd","from","qualification","qualifications"];
+   var   IgnoreWordCollege=["in","on","year","with","st","nd","rd","division","first","second","third","from","qualification","qualifications","name","place","jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec","january","february","march","april","may","june","july","august","september","october","november","december"];
 
-let num1=1;var getYear="";var getMark="";var IndexForYearMark=0;
- let Degree="";
- let College="";
- let Year="";
- let Mark="";
- let Index=-1;
- let details=[],CheckDuplicate=[];
- let words=[];
- var IgnoreWordDegree=["i","am","do","have","had","doing","did","done","does","completed","complete","completes","currently","out" ,"passed","No","Attempts","Attempt","mark","marks","pass","passes","Passing","Month","&","Remarks","Remark","(",")","-",":","–" ,"SNO","Class","Sem","Semester","Semesters","Year","Percentage","%",
- "position","division","distinction","first","second","third","1st","2nd","3rd","from","qualification","qualifications"];
- var   IgnoreWordCollege=["in","on","year","with","st","nd","rd","division","first","second","third","from","qualification","qualifications","name","place"];
-
-var ListOfDegrees=["10","X","Xth","10th","(10+2)","10+2","12","12th","XII","XIIth","high","higher","senior","secondary","school","tenth","ten","twelve","twelvfth","twelveth","twelvth","intermediate","inter","BTech","BE","b","tech","Bachelor", "of" ,"Information","Technology","Engineering","BCA","Computer","Application","Applications","Diploma","in", "DCA","m","tech","MTech","MS","Master","Science","MBA", "Business","Administration","BBA","MCA","PhD","BSc","IT","Animation","Multimedia","Certification","Networking","CCNA","Data","and","Machine","Learning","Certifications","Cybersecurity","Cyber","security","Project", "Management","PMP","full","time","correspondence","Electronics", "Communication", "Engineer","Administrator","Finance","Marketing","ECE"];
-let DegreeNameContains = ["in", "of" ,"school"];
-let CollegeNameContains = ["in", "of" ,"and","inter"];
-
- var Ischeck=true;
+  var ListOfDegrees=["10","X","Xth","10th","(10+2)","10+2","12","12th","XII","XIIth","high","higher","senior","secondary","school","tenth","ten","twelve","twelvfth","twelveth","twelvth","intermediate","inter","BTech","BE","b","tech","Bachelor", "of" ,"Information","Technology","Engineering","BCA","Computer","Application","Applications","Diploma","in", "DCA","m","tech","MTech","MS","Master","Science","MBA", "Business","Administration","BBA","MCA","PhD","BSc","IT","Animation","Multimedia","Certification","Networking","CCNA","Data","and","Machine","Learning","Certifications","Cybersecurity","Cyber","security","Project", "Management","PMP","full","time","correspondence","Electronics", "Communication", "Engineer","Administrator","Finance","Marketing","ECE"];
+  let DegreeNameContains = ["in", "of" ,"school"];
+  let CollegeNameContains = ["in", "of" ,"and","inter"];
+  
+   var Ischeck=true;
 var DegreeName=[];var CollegeName=[];var CollegeNameDetails=[];
 var WhatTypeData="U";//unknown
-
-let num=0;
-var _item="";
-
- if(educationTrimmedText.length>0)
- {
+ 
+  let num=0;
+  var _item="";
+  
+   if(educationTrimmedText.length>0)
+   {
+      
+      educationTrimmedText=educationTrimmedText.trim().replace(//g, '').replace(/\t/g, ' ').replace(/\s*\/\s*/g, '/');//.replace(/\n/g, ' ');
+   num1+1;
+    Degree="";College="";Year="";Mark="";  DegreeName=[]; CollegeName=[];
+           WhatTypeData="N";//contains no "from" word
+          educationTrimmedText=educationTrimmedText.trim().replace(/\n/g, ' ');
     
-    educationTrimmedText=educationTrimmedText.trim().replace(//g, '').replace(/\t/g, ' ').replace(/\s*\/\s*/g, '/');//.replace(/\n/g, ' ');
- num1+1;
-  Degree="";College="";Year="";Mark="";  DegreeName=[]; CollegeName=[];
-         WhatTypeData="N";//contains no "from" word
-        educationTrimmedText=educationTrimmedText.trim().replace(/\n/g, ' ');
-  
-       matchDegree= educationTrimmedText.match(regexDegreeIfNotFromEndLine); 
-  
+         matchDegree= educationTrimmedText.match(regexDegreeIfNotFromEndLine); 
+	  
+         
+   if (matchDegree) {
+   
+       words = matchDegree[0].trim().split(' ');
+     Index=matchDegree.index+matchDegree[0].length; 
+     if(WhatTypeData=="N")//contains "nofrom" word
+           {
+               CheckDuplicate=[];
+              
+     //Degree=  words.filter(item => item !== '').map(function(item,index,array){
+        Degree=  words.map(function(item,index,array){
+         
+         if(index==0){
+         IndexForYearMark=IndexForYearMark+item.length;}else{
+             IndexForYearMark=IndexForYearMark+item.length+1;
+         }
        
- if (matchDegree) {
- 
-     words = matchDegree[0].trim().split(' ');
-   Index=matchDegree.index+matchDegree[0].length; 
-   if(WhatTypeData=="N")//contains "nofrom" word
+        _item=item.trim().toLowerCase().replace(/\%/g,"").replace(/\./g,"").replace(/\,/g,"").replace(/\:/g,"").replace(/\-/g,"");
+            
+         if(!IgnoreWordDegree.map(item => item.toLowerCase()).includes(_item)  && index<words.length)
          {
-             CheckDuplicate=[];
-            
-   //Degree=  words.filter(item => item !== '').map(function(item,index,array){
-      Degree=  words.map(function(item,index,array){
-       
-       if(index==0){
-       IndexForYearMark=IndexForYearMark+item.length;}else{
-           IndexForYearMark=IndexForYearMark+item.length+1;
-       }
-     
-      _item=item.trim().toLowerCase().replace(/\%/g,"").replace(/\./g,"").replace(/\,/g,"").replace(/\:/g,"").replace(/\-/g,"");
-          
-       if(!IgnoreWordDegree.map(item => item.toLowerCase()).includes(_item)  && index<words.length)
-       {
-       if((_item==="10") || (_item==="12"))
-       { 
-       if(!DegreeName.map(item => item.toLowerCase()).includes(item))
-       {
-      
-         
-               
-                
-                DegreeName.push(item);
-        educationTrimmedText=		maskDegree(educationTrimmedText,IndexForYearMark,item);		
-                if(!CheckDuplicate.includes('D'))
-{
- CheckDuplicate.push('D');
-}
- if(CheckDuplicate.length==2 && CheckDuplicate[1]!='D'   && DegreeName.length>0 )
-  {   detail={};
-  var itemd=DegreeName.pop();
-  detail.num=num1; num1=num1+1;
-      detail.degree=DegreeName.filter(item => item !== undefined).join(" ");
-    detail.college=CollegeName.filter(item => item !== undefined).join(" ");
-   
-    getYear=get_Year(educationTrimmedText,IndexForYearMark);
-    detail.year=getYear.year;educationTrimmedText=getYear.educationTrimmedText;
-    getMark=get_Mark(educationTrimmedText,IndexForYearMark);
-    detail.mark=getMark.mark;educationTrimmedText=getMark.educationTrimmedText; 
-    details.push(detail);
-    CollegeName=[]; 
-    DegreeName=[];DegreeName.push(itemd);
-    CheckDuplicate=[];
-    CheckDuplicate.push('D');
-  }	
-               
-       }
-       } 
-       //Nan starts
-        if(Number.isNaN(Number(_item)) && !_item.includes('%')
-        && !_item.includes('/')) 
-        {  
-            if(ListOfDegrees.map(item => item.toLowerCase()).includes(_item) 
-                          )
-      {  
-        Ischeck=true;// check whether collegeorDegree
+         if((_item==="10") || (_item==="12"))
+         { 
+				 if(!DegreeName.map(item => item.toLowerCase()).includes(item) && DegreeName.length==0)
+				 {
+				
+					 
+							   
+							    
+									DegreeName.push(item);
+					educationTrimmedText=		maskDegree(educationTrimmedText,IndexForYearMark,item);		
+									if(!CheckDuplicate.includes('D'))
+	{
+	 CheckDuplicate.push('D');
+	}
+ 	if(CheckDuplicate.length==2 && CheckDuplicate[1]!='D'   && DegreeName.length>0 )
+		{   detail={};
+		var itemd=DegreeName.pop();
+		detail.num=num1; num1=num1+1;
+		    detail.degree=DegreeName.filter(item => item !== undefined).join(" ");
+			detail.college=CollegeName.filter(item => item !== undefined).join(" ");
+		 
+      getYear=get_Year(educationTrimmedText,IndexForYearMark);
+      detail.year=getYear.year;educationTrimmedText=getYear.educationTrimmedText;
+      getMark=get_Mark(educationTrimmedText,IndexForYearMark);
+      detail.mark=getMark.mark;educationTrimmedText=getMark.educationTrimmedText; 
+			details.push(detail);
+			CollegeName=[]; 
+			DegreeName=[];DegreeName.push(itemd);
+			CheckDuplicate=[];
+			CheckDuplicate.push('D');
+		}	
+							   
+				 }
+         } 
+         //Nan starts
+          if(Number.isNaN(Number(_item)) && !_item.includes('%')
+          && !_item.includes('/')) 
+          {  
+              if(ListOfDegrees.map(item => item.toLowerCase()).includes(_item) 
+                            )
+			  {  
+			    Ischeck=true;// check whether collegeorDegree
+	 
+		   if(    CollegeName && CollegeName.length > 0){ 
+			      if(( CollegeNameContains.includes(CollegeName[CollegeName.length-1].trim().toLowerCase() ) 
+            || (CheckDuplicate[CheckDuplicate.length-1]=="C" && CollegeNameContains.includes(_item.trim().toLowerCase() ) )
+          ) && _item.match(regexCollegeName)!=null
+          && !IgnoreWordCollege.map(item => item.toLowerCase()).includes(_item.trim().toLowerCase())
+        )
+			    {   
+			        Ischeck=false;
+			     
+			     	CollegeName.push(item);
+						if(!CheckDuplicate.includes('C'))
+	{
+	 CheckDuplicate.push('C');
+	} 
+ 	if(CheckDuplicate.length==2 && CheckDuplicate[1]!='C'   && DegreeName.length>0 )
+		{
+		   
+		    detail={};var itemc=CollegeName.pop();
+		detail.num=num1; num1=num1+1;
+		    detail.degree=DegreeName.filter(item => item !== undefined).join(" ");
+			detail.college=CollegeName.filter(item => item !== undefined).join(" ");
+		 
+      getYear=get_Year(educationTrimmedText,IndexForYearMark);
+      detail.year=getYear.year;educationTrimmedText=getYear.educationTrimmedText;
+      getMark=get_Mark(educationTrimmedText,IndexForYearMark);
+      detail.mark=getMark.mark;educationTrimmedText=getMark.educationTrimmedText; 
+			details.push(detail);
+			CollegeName=[];CollegeName.push(itemc); 
+			DegreeName=[];
+			CheckDuplicate=[];
+			CheckDuplicate.push('C');
+		}   
+			        
+			        
+			    }}
+			 	 /*logic */
+			  if(Ischeck)
+			  {
+			  
+			  
+			  
+              
+                  if(!DegreeName.map(item => item.toLowerCase()).includes(item))
+				  {
+                    if (DegreeNameContains.includes(_item) ) 
+							  {
+									// check whether collegeorDegree
  
-     if(    CollegeName && CollegeName.length > 0){ 
-          if(( CollegeNameContains.includes(CollegeName[CollegeName.length-1].trim().toLowerCase() ) 
-          || (CheckDuplicate[CheckDuplicate.length-1]=="C" && CollegeNameContains.includes(_item.trim().toLowerCase() ) )
-        ) && _item.match(regexCollegeName)!=null
-        && !IgnoreWordCollege.map(item => item.toLowerCase()).includes(_item.trim().toLowerCase())
-      )
-        {   
-            Ischeck=false;
-         
-           CollegeName.push(item);
-          if(!CheckDuplicate.includes('C'))
-{
- CheckDuplicate.push('C');
-} 
- if(CheckDuplicate.length==2 && CheckDuplicate[1]!='C'   && DegreeName.length>0 )
-  {
-     
-      detail={};var itemc=CollegeName.pop();
-  detail.num=num1; num1=num1+1;
-      detail.degree=DegreeName.filter(item => item !== undefined).join(" ");
-    detail.college=CollegeName.filter(item => item !== undefined).join(" ");
-   
-    getYear=get_Year(educationTrimmedText,IndexForYearMark);
-    detail.year=getYear.year;educationTrimmedText=getYear.educationTrimmedText;
-    getMark=get_Mark(educationTrimmedText,IndexForYearMark);
-    detail.mark=getMark.mark;educationTrimmedText=getMark.educationTrimmedText; 
-    details.push(detail);
-    CollegeName=[];CollegeName.push(itemc); 
-    DegreeName=[];
-    CheckDuplicate=[];
-    CheckDuplicate.push('C');
-  }   
-            
-            
-        }}
-        /*logic */
-      if(Ischeck)
-      {
-      
-      
-      
-            
-                if(!DegreeName.map(item => item.toLowerCase()).includes(item))
-        {
-                  if (DegreeNameContains.includes(_item) ) 
-              {
-                // check whether collegeorDegree
+		   if(  DegreeName && DegreeName.length > 0)
+		   { 
+			 
+			    if( DegreeNameContains.includes(DegreeName[DegreeName.length-1].trim().toLowerCase() ) 
+				|| (CheckDuplicate[CheckDuplicate.length-1]=="D" && DegreeNameContains.includes(_item.trim().toLowerCase() ) ))
+			    {    
+			      
+			       	DegreeName.push(item);
+			       	educationTrimmedText=		maskDegree(educationTrimmedText,IndexForYearMark,item);
+						if(!CheckDuplicate.includes('D'))
+						{
+						 CheckDuplicate.push('D');
+						} 
+ 	if(CheckDuplicate.length==2 && CheckDuplicate[1]!='D'   && DegreeName.length>0 )
+		{
+		   detail={};var itemd=DegreeName.pop();
+		detail.num=num1; num1=num1+1;
+		    detail.degree=DegreeName.filter(item => item !== undefined).join(" ");
+			detail.college=CollegeName.filter(item => item !== undefined).join(" ");
+		 
+      getYear=get_Year(educationTrimmedText,IndexForYearMark);
+      detail.year=getYear.year;educationTrimmedText=getYear.educationTrimmedText;
+      getMark=get_Mark(educationTrimmedText,IndexForYearMark);
+      detail.mark=getMark.mark;educationTrimmedText=getMark.educationTrimmedText; 
+			details.push(detail);
+			CollegeName=[];
+			DegreeName=[];DegreeName.push(itemd); 
+			CheckDuplicate=[];
+			CheckDuplicate.push('D');
+		}   
+		   }
+				}
+			 	 /*logic */
+									  if(_item=="school")
+									  { 
+										  if (DegreeName.map(item=> item.trim().toLowerCase()).includes("high")   && DegreeName.length>0)
+										  {
+				DegreeName.push(item);
+				educationTrimmedText=		maskDegree(educationTrimmedText,IndexForYearMark,item);
+				if(!CheckDuplicate.includes('D'))
+	{
+	 CheckDuplicate.push('D');
+	}
+ 	if(CheckDuplicate.length==2 && CheckDuplicate[1]!='D'  && DegreeName.length>0 )
+		{ detail={};var itemd=DegreeName.pop();
+		detail.num=num1; num1=num1+1;
+		    detail.degree=DegreeName.filter(item => item !== undefined).join(" ");
+			detail.college=CollegeName.filter(item => item !== undefined).join(" ");
+		 
+      getYear=get_Year(educationTrimmedText,IndexForYearMark);
+      detail.year=getYear.year;educationTrimmedText=getYear.educationTrimmedText;
+      getMark=get_Mark(educationTrimmedText,IndexForYearMark);
+      detail.mark=getMark.mark;educationTrimmedText=getMark.educationTrimmedText; 
+			details.push(detail);
+			CollegeName=[]; 
+			DegreeName=[];DegreeName.push(itemd);
 
-     if(  DegreeName && DegreeName.length > 0)
-     { 
-     
-        if( DegreeNameContains.includes(DegreeName[DegreeName.length-1].trim().toLowerCase() ) 
-      || (CheckDuplicate[CheckDuplicate.length-1]=="D" && DegreeNameContains.includes(_item.trim().toLowerCase() ) ))
-        {    
-          
-             DegreeName.push(item);
-             educationTrimmedText=		maskDegree(educationTrimmedText,IndexForYearMark,item);
-          if(!CheckDuplicate.includes('D'))
-          {
-           CheckDuplicate.push('D');
-          } 
- if(CheckDuplicate.length==2 && CheckDuplicate[1]!='D'   && DegreeName.length>0 )
-  {
-     detail={};var itemd=DegreeName.pop();
-  detail.num=num1; num1=num1+1;
-      detail.degree=DegreeName.filter(item => item !== undefined).join(" ");
-    detail.college=CollegeName.filter(item => item !== undefined).join(" ");
-   
-    getYear=get_Year(educationTrimmedText,IndexForYearMark);
-    detail.year=getYear.year;educationTrimmedText=getYear.educationTrimmedText;
-    getMark=get_Mark(educationTrimmedText,IndexForYearMark);
-    detail.mark=getMark.mark;educationTrimmedText=getMark.educationTrimmedText; 
-    details.push(detail);
-    CollegeName=[];
-    DegreeName=[];DegreeName.push(itemd); 
-    CheckDuplicate=[];
-    CheckDuplicate.push('D');
-  }   
-     }
-      }
-        /*logic */
-                  if(_item=="school")
-                  { 
-                    if (DegreeName.map(item=> item.trim().toLowerCase()).includes("high")   && DegreeName.length>0)
-                    {
-      DegreeName.push(item);
-      educationTrimmedText=		maskDegree(educationTrimmedText,IndexForYearMark,item);
-      if(!CheckDuplicate.includes('D'))
-{
- CheckDuplicate.push('D');
-}
- if(CheckDuplicate.length==2 && CheckDuplicate[1]!='D'  && DegreeName.length>0 )
-  { detail={};var itemd=DegreeName.pop();
-  detail.num=num1; num1=num1+1;
-      detail.degree=DegreeName.filter(item => item !== undefined).join(" ");
-    detail.college=CollegeName.filter(item => item !== undefined).join(" ");
-   
-    getYear=get_Year(educationTrimmedText,IndexForYearMark);
-    detail.year=getYear.year;educationTrimmedText=getYear.educationTrimmedText;
-    getMark=get_Mark(educationTrimmedText,IndexForYearMark);
-    detail.mark=getMark.mark;educationTrimmedText=getMark.educationTrimmedText; 
-    details.push(detail);
-    CollegeName=[]; 
-    DegreeName=[];DegreeName.push(itemd);
-
-    CheckDuplicate=[];
-    CheckDuplicate.push('D');
-  }								   
-                   
-                    }
-                    else
-                    {
-                       if(CollegeName.length>0 
-                        && !IgnoreWordCollege.map(item => item.toLowerCase()).includes(item.trim().toLowerCase())
-                         && item.match(regexCollegeName)!=null
-                     )
-                    {
-      CollegeName.push(item);
-          if(!CheckDuplicate.includes('C'))
-{
- CheckDuplicate.push('C');
-} 
- if(CheckDuplicate.length==2 && CheckDuplicate[1]!='C'   && DegreeName.length>0 )
-  { detail={};var itemc=CollegeName.pop();
-  detail.num=num1; num1=num1+1;
-      detail.degree=DegreeName.filter(item => item !== undefined).join(" ");
-    detail.college=CollegeName.filter(item => item !== undefined).join(" ");
-   
-    getYear=get_Year(educationTrimmedText,IndexForYearMark);
-    detail.year=getYear.year;educationTrimmedText=getYear.educationTrimmedText;
-    getMark=get_Mark(educationTrimmedText,IndexForYearMark);
-    detail.mark=getMark.mark;educationTrimmedText=getMark.educationTrimmedText; 
-    details.push(detail);
-    CollegeName=[];CollegeName.push(itemc); 
-    DegreeName=[];
-    CheckDuplicate=[];
-    CheckDuplicate.push('C');
-  }
-  
+			CheckDuplicate=[];
+			CheckDuplicate.push('D');
+		}								   
+						 			  
+										  }
+										  else
+										  {
+											   if(CollegeName.length>0 
+                          && !IgnoreWordCollege.map(item => item.toLowerCase()).includes(item.trim().toLowerCase())
+                           && item.match(regexCollegeName)!=null
+										   )
+											{
+				CollegeName.push(item);
+						if(!CheckDuplicate.includes('C'))
+	{
+	 CheckDuplicate.push('C');
+	} 
+ 	if(CheckDuplicate.length==2 && CheckDuplicate[1]!='C'   && DegreeName.length>0 )
+		{ detail={};var itemc=CollegeName.pop();
+		detail.num=num1; num1=num1+1;
+		    detail.degree=DegreeName.filter(item => item !== undefined).join(" ");
+			detail.college=CollegeName.filter(item => item !== undefined).join(" ");
+		 
+      getYear=get_Year(educationTrimmedText,IndexForYearMark);
+      detail.year=getYear.year;educationTrimmedText=getYear.educationTrimmedText;
+      getMark=get_Mark(educationTrimmedText,IndexForYearMark);
+      detail.mark=getMark.mark;educationTrimmedText=getMark.educationTrimmedText; 
+			details.push(detail);
+			CollegeName=[];CollegeName.push(itemc); 
+			DegreeName=[];
+			CheckDuplicate=[];
+			CheckDuplicate.push('C');
+		}
+		
+			 	 
+											  }
+										  }
+									  }
+									  
+							   }
+							   else
+							   {
+					 
+			DegreeName.push(item);
+			educationTrimmedText=		maskDegree(educationTrimmedText,IndexForYearMark,item);
+			if 	(!CheckDuplicate.includes('D'))
+	{
+	 CheckDuplicate.push('D');
+	}
+ 	if(CheckDuplicate.length==2 && CheckDuplicate[1]!='D'  && DegreeName.length>0 )
+		{  
+		    
+		    detail={};var itemd=DegreeName.pop();
+		detail.num=num1; num1=num1+1;
+		    detail.degree=DegreeName.filter(item => item !== undefined).join(" ");
+			detail.college=CollegeName.filter(item => item !== undefined).join(" ");
+		 
+      getYear=get_Year(educationTrimmedText,IndexForYearMark);
+      detail.year=getYear.year;educationTrimmedText=getYear.educationTrimmedText;
+      getMark=get_Mark(educationTrimmedText,IndexForYearMark);
+      detail.mark=getMark.mark;educationTrimmedText=getMark.educationTrimmedText; 
+			details.push(detail);
+			CollegeName=[]; 
+			DegreeName=[];DegreeName.push(itemd);
+			CheckDuplicate=[];
+			CheckDuplicate.push('D');
+		}	
+			
+									
+				 
+							   }
+                  }
+             } 
+              }
+               else{  
+              const regexParenthesis = /\([a-z.\s]+\)?|\(?[a-z.\s]+\)|\([a-z.\s]+\)/g;
+              const wordsWithParenthesis = _item.match(regexParenthesis);
+              if(wordsWithParenthesis)
+              { 
+                const  wordsParenthesis = _item.trim().split(/[\(\)]/);
+                var Isexists=false;
+         wordsParenthesis.map(function(itemP,index,array){
+            
+            
+              if(ListOfDegrees.map(item => item.toLowerCase()).includes(itemP)  ){
+                  Isexists=true;
         
-                      }
-                    }
+             
+              }
+                  });
+                  if(Isexists){
+                       if(!DegreeName.map(item => item.toLowerCase()).includes(item) )
+					   {
+					     
+          DegreeName.push(item); 
+          educationTrimmedText=		maskDegree(educationTrimmedText,IndexForYearMark,item);
+	if(!CheckDuplicate.includes('D'))
+	{
+	 CheckDuplicate.push('D');
+	}
+ 	if(CheckDuplicate.length==2 && CheckDuplicate[1]!='D'  && DegreeName.length>0 )
+		{ detail={};var itemd=DegreeName.pop();
+		detail.num=num1; num1=num1+1;
+		    detail.degree=DegreeName.filter(item => item !== undefined).join(" ");
+			detail.college=CollegeName.filter(item => item !== undefined).join(" ");
+		 
+      getYear=get_Year(educationTrimmedText,IndexForYearMark);
+      detail.year=getYear.year;educationTrimmedText=getYear.educationTrimmedText;
+      getMark=get_Mark(educationTrimmedText,IndexForYearMark);
+      detail.mark=getMark.mark;educationTrimmedText=getMark.educationTrimmedText; 
+			details.push(detail);
+			CollegeName=[]; 
+			DegreeName=[];DegreeName.push(itemd);
+			CheckDuplicate=[];
+			CheckDuplicate.push('D');
+		}
+		
+                       }
+                  }else{
+                        if(!CollegeName.map(item => item.toLowerCase()).includes(item.toLowerCase())
+                       &&
+                      Number.isNaN(Number(item.replace(/\(/g,'').replace(/\)/g,''))) && !item.includes('%')
+           && !item.includes('/')
+                   && !IgnoreWordCollege.map(item => item.toLowerCase()).includes(item.trim().toLowerCase())      
+                       && item.match(regexCollegeName)!=null){
+         CollegeName.push(item);
+         if(!CheckDuplicate.includes('C'))
+	{
+	 CheckDuplicate.push('C');
+	} 
+ 	if(CheckDuplicate.length==2 && CheckDuplicate[1]!='C'   && DegreeName.length>0 )
+		{ detail={};var itemc=CollegeName.pop();
+		detail.num=num1; num1=num1+1;
+		    detail.degree=DegreeName.filter(item => item !== undefined).join(" ");
+			detail.college=CollegeName.filter(item => item !== undefined).join(" ");
+		 
+      getYear=get_Year(educationTrimmedText,IndexForYearMark);
+      detail.year=getYear.year;educationTrimmedText=getYear.educationTrimmedText;
+      getMark=get_Mark(educationTrimmedText,IndexForYearMark);
+      detail.mark=getMark.mark;educationTrimmedText=getMark.educationTrimmedText; 
+			details.push(detail);
+			CollegeName=[]; CollegeName.push(itemc);
+			DegreeName=[];
+			CheckDuplicate=[];
+			CheckDuplicate.push('C');
+		}                  
+                     
+                   
+                       }
+                  }
                   }
                   
-               }
-               else
-               {
-         
-    DegreeName.push(item);
-    educationTrimmedText=		maskDegree(educationTrimmedText,IndexForYearMark,item);
-    if 	(!CheckDuplicate.includes('D'))
-{
- CheckDuplicate.push('D');
-}
- if(CheckDuplicate.length==2 && CheckDuplicate[1]!='D'  && DegreeName.length>0 )
-  {  
-      
-      detail={};var itemd=DegreeName.pop();
-  detail.num=num1; num1=num1+1;
-      detail.degree=DegreeName.filter(item => item !== undefined).join(" ");
-    detail.college=CollegeName.filter(item => item !== undefined).join(" ");
-   
-    getYear=get_Year(educationTrimmedText,IndexForYearMark);
-    detail.year=getYear.year;educationTrimmedText=getYear.educationTrimmedText;
-    getMark=get_Mark(educationTrimmedText,IndexForYearMark);
-    detail.mark=getMark.mark;educationTrimmedText=getMark.educationTrimmedText; 
-    details.push(detail);
-    CollegeName=[]; 
-    DegreeName=[];DegreeName.push(itemd);
-    CheckDuplicate=[];
-    CheckDuplicate.push('D');
-  }	
-    
-                
-       
-               }
-                }
-           } 
-            }
-             else{  
-            const regexParenthesis = /\([a-z.\s]+\)?|\(?[a-z.\s]+\)|\([a-z.\s]+\)/g;
-            const wordsWithParenthesis = _item.match(regexParenthesis);
-            if(wordsWithParenthesis)
-            { 
-              const  wordsParenthesis = _item.trim().split(/[\(\)]/);
-              var Isexists=false;
-       wordsParenthesis.map(function(itemP,index,array){
-          
-          
-            if(ListOfDegrees.map(item => item.toLowerCase()).includes(itemP)  ){
-                Isexists=true;
-      
+              else{   
+                  if(!CollegeName.map(item => item.toLowerCase()).includes(item.toLowerCase())
+                  &&
+                      Number.isNaN(Number(
+                     item.replace(/\(/g,'').replace(/\)/g,''))) && !item.includes('%')
+           && !item.includes('/')
            
-            }
-                });
-                if(Isexists){
-                     if(!DegreeName.map(item => item.toLowerCase()).includes(item) )
-           {
+            && !IgnoreWordCollege.map(item => item.toLowerCase()).includes(item.trim().toLowerCase()) 
+             && item.match(regexCollegeName)!=null){
+                      
+  CollegeName.push(item);
+  	if(!CheckDuplicate.includes('C'))
+	{
+	 CheckDuplicate.push('C');
+	} 
+ 	if(CheckDuplicate.length==2 && CheckDuplicate[1]!='C'   && DegreeName.length>0 )
+		{ detail={};var itemc=CollegeName.pop();
+		detail.num=num1; num1=num1+1;
+		    detail.degree=DegreeName.filter(item => item !== undefined).join(" ");
+			detail.college=CollegeName.filter(item => item !== undefined).join(" ");
+		 
+      getYear=get_Year(educationTrimmedText,IndexForYearMark);
+      detail.year=getYear.year;educationTrimmedText=getYear.educationTrimmedText;
+      getMark=get_Mark(educationTrimmedText,IndexForYearMark);
+      detail.mark=getMark.mark;educationTrimmedText=getMark.educationTrimmedText; 
+			details.push(detail);
+			CollegeName=[]; CollegeName.push(itemc);
+			DegreeName=[];
+			CheckDuplicate=[];
+			CheckDuplicate.push('C');
+		}	                    
+                
+           
+               	 	
+              }
+              }
              
-        DegreeName.push(item); 
-        educationTrimmedText=		maskDegree(educationTrimmedText,IndexForYearMark,item);
-if(!CheckDuplicate.includes('D'))
-{
- CheckDuplicate.push('D');
-}
- if(CheckDuplicate.length==2 && CheckDuplicate[1]!='D'  && DegreeName.length>0 )
-  { detail={};var itemd=DegreeName.pop();
-  detail.num=num1; num1=num1+1;
-      detail.degree=DegreeName.filter(item => item !== undefined).join(" ");
-    detail.college=CollegeName.filter(item => item !== undefined).join(" ");
-   
-    getYear=get_Year(educationTrimmedText,IndexForYearMark);
-    detail.year=getYear.year;educationTrimmedText=getYear.educationTrimmedText;
-    getMark=get_Mark(educationTrimmedText,IndexForYearMark);
-    detail.mark=getMark.mark;educationTrimmedText=getMark.educationTrimmedText; 
-    details.push(detail);
-    CollegeName=[]; 
-    DegreeName=[];DegreeName.push(itemd);
-    CheckDuplicate=[];
-    CheckDuplicate.push('D');
-  }
-  
-                     }
-                }else{
-                      if(!CollegeName.map(item => item.toLowerCase()).includes(item.toLowerCase())
-                     &&
-                    Number.isNaN(Number(item.replace(/\(/g,'').replace(/\)/g,''))) && !item.includes('%')
-         && !item.includes('/')
-                 && !IgnoreWordCollege.map(item => item.toLowerCase()).includes(item.trim().toLowerCase())      
-                     && item.match(regexCollegeName)!=null){
-       CollegeName.push(item);
-       if(!CheckDuplicate.includes('C'))
-{
- CheckDuplicate.push('C');
-} 
- if(CheckDuplicate.length==2 && CheckDuplicate[1]!='C'   && DegreeName.length>0 )
-  { detail={};var itemc=CollegeName.pop();
-  detail.num=num1; num1=num1+1;
-      detail.degree=DegreeName.filter(item => item !== undefined).join(" ");
-    detail.college=CollegeName.filter(item => item !== undefined).join(" ");
-   
-    getYear=get_Year(educationTrimmedText,IndexForYearMark);
-    detail.year=getYear.year;educationTrimmedText=getYear.educationTrimmedText;
-    getMark=get_Mark(educationTrimmedText,IndexForYearMark);
-    detail.mark=getMark.mark;educationTrimmedText=getMark.educationTrimmedText; 
-    details.push(detail);
-    CollegeName=[]; CollegeName.push(itemc);
-    DegreeName=[];
-    CheckDuplicate=[];
-    CheckDuplicate.push('C');
-  }                  
-                   
-                 
-                     }
-                }
-                }
-                
-            else{   
-                if(!CollegeName.map(item => item.toLowerCase()).includes(item.toLowerCase())
-                &&
-                    Number.isNaN(Number(
-                   item.replace(/\(/g,'').replace(/\)/g,''))) && !item.includes('%')
-         && !item.includes('/')
-         
-          && !IgnoreWordCollege.map(item => item.toLowerCase()).includes(item.trim().toLowerCase()) 
-           && item.match(regexCollegeName)!=null){
-                    
-CollegeName.push(item);
-  if(!CheckDuplicate.includes('C'))
-{
- CheckDuplicate.push('C');
-} 
- if(CheckDuplicate.length==2 && CheckDuplicate[1]!='C'   && DegreeName.length>0 )
-  { detail={};var itemc=CollegeName.pop();
-  detail.num=num1; num1=num1+1;
-      detail.degree=DegreeName.filter(item => item !== undefined).join(" ");
-    detail.college=CollegeName.filter(item => item !== undefined).join(" ");
-   
-    getYear=get_Year(educationTrimmedText,IndexForYearMark);
-    detail.year=getYear.year;educationTrimmedText=getYear.educationTrimmedText;
-    getMark=get_Mark(educationTrimmedText,IndexForYearMark);
-    detail.mark=getMark.mark;educationTrimmedText=getMark.educationTrimmedText; 
-    details.push(detail);
-    CollegeName=[]; CollegeName.push(itemc);
-    DegreeName=[];
-    CheckDuplicate=[];
-    CheckDuplicate.push('C');
-  }	                    
+             
               
+          }//Nan ends
          
-                  
-            }
-            }
-           
-           
-            
-        }//Nan ends
+          }
+         
+         }//if end
        
-        }
-       
-       }//if end
+         }); 
      
-       }); 
-   
-//endd
-if(DegreeName.length>0){
-let detail={};
-
- detail.num=num1; num1=num1+1;
- detail.degree=DegreeName.filter(item => item !== undefined).join(" ");
- detail.college=CollegeName.filter(item => item !== undefined).join(" ");
- 
-
-   detail.year=get_Year(educationTrimmedText,IndexForYearMark).year;
-  detail.mark=get_Mark(educationTrimmedText,IndexForYearMark).mark;
-  details.push(detail);
-}
-     }
- }
-     return details;
-   }
+ //endd
+  if(DegreeName.length>0){
+  let detail={};
   
-};
+   detail.num=num1; num1=num1+1;
+   detail.degree=DegreeName.filter(item => item !== undefined).join(" ");
+   detail.college=CollegeName.filter(item => item !== undefined).join(" ");
+   
+  getYear=get_Year(educationTrimmedText,IndexForYearMark);
+      detail.year=getYear.year;educationTrimmedText=getYear.educationTrimmedText;
+      getMark=get_Mark(educationTrimmedText,IndexForYearMark);
+      detail.mark=getMark.mark;educationTrimmedText=getMark.educationTrimmedText
+    // detail.year=get_Year(educationTrimmedText,IndexForYearMark).year;
+   // detail.mark=get_Mark(educationTrimmedText,IndexForYearMark).mark;
+    details.push(detail);
+  }
+       }
+   }
+       return details;
+     }
+    
+ };
+ 
+ 
 
    
 
